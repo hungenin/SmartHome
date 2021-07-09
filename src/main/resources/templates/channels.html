@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Channels</title>
+</head>
+<body>
+<div th:each="channel : ${channels}">
+    <div th:text="${channel.name}"></div>
+    <div th:text="${channel.follow} ? 'follow' : 'unfollow'"></div>
+</div>
+</body>
+</html>

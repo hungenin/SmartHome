@@ -5,9 +5,13 @@
     <title>Channels</title>
 </head>
 <body>
-<div th:each="channel : ${channels}">
-    <div th:text="${channel.name}"></div>
-    <div th:text="${channel.follow} ? 'follow' : 'unfollow'"></div>
+<div>
+    <ul>
+        <li th:each="channel : ${channels}">
+            <div th:text="${channel.name}"></div>
+            <div><a th:href="'/channels/' + ${channel.id} + (${channel.follow} ? '/unfollow' : '/follow')" th:text="${channel.follow} ? 'followed' : 'not followed'"></a></div>
+        </li>
+    </ul>
 </div>
 </body>
 </html>

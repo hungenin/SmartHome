@@ -35,4 +35,8 @@ public class ChannelService {
     public List<Channel> followedChannels() {
         return channelDao.followedChannels();
     }
+
+    public void updateFollowById(Channel channel) {
+        channelDao.updateFollowById(channel);
+    }
 }

@@ -11,4 +11,6 @@ public interface ChannelDao {
     void deleteChannelById(Long channelId);
     List<Channel> channels();
     List<Channel> followedChannels();
+
+    void updateFollowById(Channel channel);
 }

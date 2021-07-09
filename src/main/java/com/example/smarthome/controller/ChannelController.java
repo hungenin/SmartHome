@@ -1,14 +1,12 @@
 package com.example.smarthome.controller;
 
 import com.example.smarthome.data_sample.ChannelCreator;
+import com.example.smarthome.model.tvGuide.Channel;
 import com.example.smarthome.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("channels")
@@ -17,10 +15,10 @@ public class ChannelController {
     private ChannelService channelService;
 
     @GetMapping("/init")
-    public String init(){
+    public String init() {
         ChannelCreator.getChannels().forEach(channelService::addChannel);
 
-        return "redirect:/";
+        return "redirect:/channels";
     }
 
     @GetMapping
@@ -30,6 +28,23 @@ public class ChannelController {
         return "channels";
     }
 
+    @GetMapping("/{channelId}/follow")
+    public String setFollowById(@PathVariable Long channelId) {
+        channelService.updateFollowById(Channel.builder().id(channelId).follow(true).build());
+
+        return "redirect:/channels";
+    }
+
+    @GetMapping("/{channelId}/unfollow")
+    public String setUnfollowById(@PathVariable Long channelId) {
+        channelService.updateFollowById(Channel.builder().id(channelId).follow(false).build());
+
+        return "redirect:/channels";
+    }
+
+
+
+    /*
     @GetMapping("/refresh/channel_list")
     public String refreshChannelsList() {
         return "";
@@ -43,5 +58,5 @@ public class ChannelController {
     @GetMapping("/refresh/{channelId}")
     public String refreshChannelById(@PathVariable long channelId) {
         return "";
-    }
+    }*/
 }

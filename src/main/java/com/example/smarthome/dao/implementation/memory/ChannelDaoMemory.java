@@ -52,7 +52,16 @@ public class ChannelDaoMemory implements ChannelDao {
     @Override
     public List<Channel> followedChannels() {
         return channels.stream()
-                .filter(channel -> channel.getFollow())
+                .filter(Channel::getFollow)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateFollowById(Channel channel) {
+        channels.stream()
+                .filter(channel1 -> channel1.equals(channel))
+                .forEach(channel1 -> {
+                    channel1.setFollow(channel.getFollow());
+                });
     }
 }

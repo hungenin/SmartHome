@@ -1,8 +1,6 @@
 package com.example.smarthome.controller;
 
-import com.example.smarthome.data_sample.ChannelCreator;
 import com.example.smarthome.model.tvGuide.Channel;
-import com.example.smarthome.model.tvGuide.Program;
 import com.example.smarthome.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,13 +12,6 @@ import org.springframework.web.bind.annotation.*;
 public class ChannelController {
     @Autowired
     private ChannelService channelService;
-
-    @GetMapping("/init")
-    public String init() {
-        ChannelCreator.getChannels().forEach(channelService::add);
-
-        return "redirect:/channels";
-    }
 
     @RequestMapping("/add")
     public String add(@RequestBody Channel channel) {

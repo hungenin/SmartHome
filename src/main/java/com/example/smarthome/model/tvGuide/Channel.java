@@ -5,11 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class Channel {
     @JsonIgnore
     private Long id;
-    @JsonIgnore
     private String name;
     private Boolean follow;
 

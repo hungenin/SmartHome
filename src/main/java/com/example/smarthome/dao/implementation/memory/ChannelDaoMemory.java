@@ -23,9 +23,9 @@ public class ChannelDaoMemory implements ChannelDao {
     }
 
     @Override
-    public Channel get(Long channelId) {
+    public Channel get(Long id) {
         return channels.stream()
-                .filter(channel -> channel.getId().equals(channelId))
+                .filter(channel -> channel.getId().equals(id))
                 .map(channel -> channel.toBuilder().build())
                 .findFirst()
                 .orElse(null);

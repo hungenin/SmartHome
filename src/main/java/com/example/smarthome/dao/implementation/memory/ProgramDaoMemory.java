@@ -22,9 +22,9 @@ public class ProgramDaoMemory implements ProgramDao {
     }
 
     @Override
-    public Program get(Long programId) {
+    public Program get(Long id) {
         return programs.stream()
-                .filter(program -> program.getId().equals(programId))
+                .filter(program -> program.getId().equals(id))
                 .map(program -> program.toBuilder().build())
                 .findFirst()
                 .orElse(null);

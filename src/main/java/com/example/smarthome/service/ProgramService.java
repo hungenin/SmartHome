@@ -16,8 +16,8 @@ public class ProgramService {
         programDao.add(program);
     }
 
-    public Program get(Long programId) {
-        return programDao.get(programId);
+    public Program get(Long id) {
+        return programDao.get(id);
     }
 
     public void update(Program program) {

@@ -5,12 +5,12 @@ import com.example.smarthome.model.tvGuide.Channel;
 import java.util.List;
 
 public interface ChannelDao {
-    void addChannel(Channel channel);
-    Channel getChannelById(Long channelId);
-    void updateChannelById(Long channelId, Channel channel);
-    void deleteChannelById(Long channelId);
+    void add(Channel channel);
+    Channel get(Long id);
+    void update(Channel channel);
+    void delete(Channel channel);
     List<Channel> channels();
-    List<Channel> followedChannels();
 
-    void updateFollowById(Channel channel);
+    List<Channel> followedChannels();
+    void setFollow(Channel channel);
 }

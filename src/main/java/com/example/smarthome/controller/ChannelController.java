@@ -2,6 +2,7 @@ package com.example.smarthome.controller;
 
 import com.example.smarthome.data_sample.ChannelCreator;
 import com.example.smarthome.model.tvGuide.Channel;
+import com.example.smarthome.model.tvGuide.Program;
 import com.example.smarthome.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,35 @@ public class ChannelController {
     @GetMapping("/init")
     public String init() {
         ChannelCreator.getChannels().forEach(channelService::add);
+
+        return "redirect:/channels";
+    }
+
+    @RequestMapping("/add")
+    public String add(@RequestBody Channel channel) {
+        channelService.add(channel);
+
+        return "redirect:/channels";
+    }
+
+    @RequestMapping("/{id}")
+    public String get(@PathVariable Long id, Model model) {
+        model.addAttribute("program", channelService.get(id));
+
+        return "channel";
+    }
+
+    @RequestMapping("/update/{id}")
+    public String update(@PathVariable Long id, @RequestBody Channel channel) {
+        channel.setId(id);
+        channelService.update(channel);
+
+        return "redirect:/channels";
+    }
+
+    @RequestMapping("/delete/{id}")
+    public String delete(@PathVariable Long id) {
+        channelService.delete(Channel.builder().id(id).build());
 
         return "redirect:/channels";
     }

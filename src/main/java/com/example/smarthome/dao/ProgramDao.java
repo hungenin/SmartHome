@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ProgramDao {
     void add(Program program);
-    Program get(Long programId);
+    Program get(Long id);
     void update(Program program);
     void delete(Program program);
     List<Program> programs();

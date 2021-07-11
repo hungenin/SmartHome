@@ -22,24 +22,24 @@ public class ProgramController {
         return "redirect:/programs";
     }
 
-    @RequestMapping("/{programId}")
-    public String get(@PathVariable Long programId, Model model) {
-        model.addAttribute("program", programService.get(programId));
+    @RequestMapping("/{id}")
+    public String get(@PathVariable Long id, Model model) {
+        model.addAttribute("program", programService.get(id));
 
         return "program";
     }
 
-    @RequestMapping("/update/{programId}")
-    public String update(@PathVariable Long programId, @RequestBody Program program) {
-        program.setId(programId);
+    @RequestMapping("/update/{id}")
+    public String update(@PathVariable Long id, @RequestBody Program program) {
+        program.setId(id);
         programService.update(program);
 
         return "redirect:/programs";
     }
 
-    @RequestMapping("/delete/{programId}")
-    public String delete(@PathVariable Long programId) {
-        programService.delete(Program.builder().id(programId).build());
+    @RequestMapping("/delete/{id}")
+    public String delete(@PathVariable Long id) {
+        programService.delete(Program.builder().id(id).build());
 
         return "redirect:/programs";
     }

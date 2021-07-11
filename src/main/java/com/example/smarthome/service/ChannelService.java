@@ -12,20 +12,20 @@ public class ChannelService {
     @Autowired
     private ChannelDao channelDao;
 
-    public void addChannel(Channel channel) {
-        channelDao.addChannel(channel);
+    public void add(Channel channel) {
+        channelDao.add(channel);
     }
 
-    public Channel getChannelById(Long channelId) {
-        return channelDao.getChannelById(channelId);
+    public Channel get(Long id) {
+        return channelDao.get(id);
     }
 
-    public void updateChannelById(Long channelId, Channel channel) {
-        channelDao.updateChannelById(channelId, channel);
+    public void update(Channel channel) {
+        channelDao.update(channel);
     }
 
-    public void deleteChannelById(Long channelId) {
-        channelDao.deleteChannelById(channelId);
+    public void delete(Channel channel) {
+        channelDao.delete(channel);
     }
 
     public List<Channel> channels() {
@@ -36,7 +36,7 @@ public class ChannelService {
         return channelDao.followedChannels();
     }
 
-    public void updateFollowById(Channel channel) {
-        channelDao.updateFollowById(channel);
+    public void setFollow(Channel channel) {
+        channelDao.setFollow(channel);
     }
 }

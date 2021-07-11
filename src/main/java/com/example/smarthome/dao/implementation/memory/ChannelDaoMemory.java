@@ -11,28 +11,30 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ChannelDaoMemory implements ChannelDao {
-    private AtomicLong id = new AtomicLong(1);
+    private AtomicLong idCounter = new AtomicLong(1);
     private List<Channel> channels = new ArrayList<>();
 
     @Override
-    public void addChannel(Channel channel) {
-        channel.setId(id.getAndIncrement());
-        //TODO add if not exists
-        channels.add(channel);
+    public void add(Channel channel) {
+        if (channel.getId() == null || !channels.contains(channel)){
+            channel.setId(idCounter.getAndIncrement());
+            channels.add(channel.toBuilder().build());
+        }
     }
 
     @Override
-    public Channel getChannelById(Long channelId) {
+    public Channel get(Long channelId) {
         return channels.stream()
                 .filter(channel -> channel.getId().equals(channelId))
+                .map(channel -> channel.toBuilder().build())
                 .findFirst()
                 .orElse(null);
     }
 
     @Override
-    public void updateChannelById(Long channelId, Channel channel) {
+    public void update(Channel channel) {
         channels.stream()
-                .filter(channel1 -> channel1.getId().equals(channelId))
+                .filter(channel::equals)
                 .forEach(channel1 -> {
                     channel1.setName(channel.getName());
                     channel1.setFollow(channel.getFollow());
@@ -40,8 +42,8 @@ public class ChannelDaoMemory implements ChannelDao {
     }
 
     @Override
-    public void deleteChannelById(Long channelId) {
-        channels.removeIf(channel -> channel.getId().equals(channelId));
+    public void delete(Channel channel) {
+        channels.removeIf(channel::equals);
     }
 
     @Override
@@ -57,11 +59,9 @@ public class ChannelDaoMemory implements ChannelDao {
     }
 
     @Override
-    public void updateFollowById(Channel channel) {
+    public void setFollow(Channel channel) {
         channels.stream()
-                .filter(channel1 -> channel1.equals(channel))
-                .forEach(channel1 -> {
-                    channel1.setFollow(channel.getFollow());
-                });
+                .filter(channel::equals)
+                .forEach(channel1 -> channel1.setFollow(channel.getFollow()));
     }
 }

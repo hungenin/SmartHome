@@ -16,7 +16,7 @@ public class ChannelController {
 
     @GetMapping("/init")
     public String init() {
-        ChannelCreator.getChannels().forEach(channelService::addChannel);
+        ChannelCreator.getChannels().forEach(channelService::add);
 
         return "redirect:/channels";
     }
@@ -29,34 +29,16 @@ public class ChannelController {
     }
 
     @GetMapping("/{channelId}/follow")
-    public String setFollowById(@PathVariable Long channelId) {
-        channelService.updateFollowById(Channel.builder().id(channelId).follow(true).build());
+    public String setFollow(@PathVariable Long channelId) {
+        channelService.setFollow(Channel.builder().id(channelId).follow(true).build());
 
         return "redirect:/channels";
     }
 
     @GetMapping("/{channelId}/unfollow")
-    public String setUnfollowById(@PathVariable Long channelId) {
-        channelService.updateFollowById(Channel.builder().id(channelId).follow(false).build());
+    public String setUnfollow(@PathVariable Long channelId) {
+        channelService.setFollow(Channel.builder().id(channelId).follow(false).build());
 
         return "redirect:/channels";
     }
-
-
-
-    /*
-    @GetMapping("/refresh/channel_list")
-    public String refreshChannelsList() {
-        return "";
-    }
-
-    @GetMapping("/refresh")
-    public String refreshFollowedChannels() {
-        return "";
-    }
-
-    @GetMapping("/refresh/{channelId}")
-    public String refreshChannelById(@PathVariable long channelId) {
-        return "";
-    }*/
 }

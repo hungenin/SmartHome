@@ -1,4 +1,4 @@
-package com.example.smarthome.controller.rest;
+package com.example.smarthome.controller.api;
 
 import com.example.smarthome.model.tvGuide.dto.ChannelDto;
 import com.example.smarthome.service.TvGuideService;

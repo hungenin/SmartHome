@@ -13,21 +13,21 @@ public class ChannelController {
     @Autowired
     private ChannelService channelService;
 
-    @RequestMapping("/add")
+    @PostMapping
     public String add(@RequestBody Channel channel) {
         channelService.add(channel);
 
         return "redirect:/channels";
     }
 
-    @RequestMapping("/{id}")
+    @GetMapping("/{id}")
     public String get(@PathVariable Long id, Model model) {
         model.addAttribute("program", channelService.get(id));
 
         return "channel";
     }
 
-    @RequestMapping("/update/{id}")
+    @PutMapping("/{id}")
     public String update(@PathVariable Long id, @RequestBody Channel channel) {
         channel.setId(id);
         channelService.update(channel);
@@ -35,7 +35,7 @@ public class ChannelController {
         return "redirect:/channels";
     }
 
-    @RequestMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
         channelService.delete(Channel.builder().id(id).build());
 

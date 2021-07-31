@@ -1,6 +1,7 @@
 package com.example.smarthome.dao;
 
 import com.example.smarthome.model.tvGuide.Program;
+import com.example.smarthome.model.tvGuide.dto.ProgramDto;
 
 import java.util.List;
 
@@ -10,4 +11,7 @@ public interface ProgramDao {
     void update(Program program);
     void delete(Program program);
     List<Program> programs();
+
+    void addProgramToChannel(Long programId, Long channelId);
+    List<Program> programsByChannel(Long id);
 }

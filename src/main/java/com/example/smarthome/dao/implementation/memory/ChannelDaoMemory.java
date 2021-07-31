@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ChannelDaoMemory implements ChannelDao {
-    private AtomicLong idCounter = new AtomicLong(1);
-    private List<Channel> channels = new ArrayList<>();
+    private final AtomicLong idCounter = new AtomicLong(1);
+    private final List<Channel> channels = new ArrayList<>();
 
     @Override
     public void add(Channel channel) {

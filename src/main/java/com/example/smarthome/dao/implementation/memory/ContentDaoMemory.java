@@ -4,14 +4,14 @@ import com.example.smarthome.dao.ContentDao;
 import com.example.smarthome.model.tvGuide.Content;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class ContentDaoMemory implements ContentDao {
-    private AtomicLong idCounter = new AtomicLong(1);
-    private List<Content> contents = new ArrayList<>();
+    private final AtomicLong idCounter = new AtomicLong(1);
+    private final List<Content> contents = new ArrayList<>();
+    private final Map<Long, Set<Long>> contentIdToProgramIds = new HashMap<>();
 
     @Override
     public void add(Content content) {
@@ -48,5 +48,24 @@ public class ContentDaoMemory implements ContentDao {
     @Override
     public List<Content> contents() {
         return new ArrayList<>(contents);
+    }
+
+    @Override
+    public void addContentToProgram(Long contentId, Long programId) {
+        if (!contentIdToProgramIds.containsKey(contentId)){
+            contentIdToProgramIds.put(contentId, new HashSet<>());
+        }
+        contentIdToProgramIds.get(contentId).add(programId);
+    }
+
+    @Override
+    public Content contentByProgram(Long id) {
+        return contentIdToProgramIds.entrySet()
+                .stream()
+                .filter(longSetEntry -> longSetEntry.getValue().contains(id))
+                .map(Map.Entry::getKey)
+                .map(this::get)
+                .findFirst()
+                .orElse(null);
     }
 }

@@ -31,4 +31,12 @@ public class ProgramService {
     public List<Program> programs() {
         return programDao.programs();
     }
+
+    public List<Program> programsByChannel(Long id) {
+        return programDao.programsByChannel(id);
+    }
+
+    public void addProgramToChannel(Long programId, Long channelId) {
+        programDao.addProgramToChannel(programId, channelId);
+    }
 }

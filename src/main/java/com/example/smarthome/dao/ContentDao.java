@@ -10,4 +10,7 @@ public interface ContentDao {
     void update(Content content);
     void delete(Content content);
     List<Content> contents();
+
+    void addContentToProgram(Long contentId, Long programId);
+    Content contentByProgram(Long id);
 }

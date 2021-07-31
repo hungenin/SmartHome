@@ -13,9 +13,11 @@ public class ChannelCreator {
                         .build(),
                 Channel.builder()
                         .name("M4 sport")
+                        .follow(false)
                         .build(),
                 Channel.builder()
                         .name("Viasat")
+                        .follow(false)
                         .build()
         );
     }

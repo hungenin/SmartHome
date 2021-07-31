@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("channels")
+@RequestMapping("/channels")
 public class ChannelController {
     @Autowired
     private ChannelService channelService;

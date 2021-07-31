@@ -1,7 +1,11 @@
 package com.example.smarthome.service;
 
 import com.example.smarthome.dao.ChannelDao;
+import com.example.smarthome.dao.ContentDao;
 import com.example.smarthome.dao.ProgramDao;
+import com.example.smarthome.data_sample.ChannelCreator;
+import com.example.smarthome.data_sample.ContentCreator;
+import com.example.smarthome.data_sample.ProgramCreator;
 import com.example.smarthome.model.tvGuide.Channel;
 import com.example.smarthome.model.tvGuide.Program;
 import com.example.smarthome.model.tvGuide.dto.ChannelDto;
@@ -19,6 +23,8 @@ public class TvGuideService {
     private ChannelDao channelDao;
     @Autowired
     private ProgramDao programDao;
+    @Autowired
+    private ContentDao contentDao;
 
     public List<ChannelDto> followedChannelsWithPrograms() {
         return channelDao.followedChannels().stream()
@@ -32,5 +38,15 @@ public class TvGuideService {
                                 .collect(Collectors.toList()))
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public void init() {
+        ChannelCreator.getChannels().forEach(channelDao::add);
+        ProgramCreator.getPrograms().forEach(programDao::add);
+        ContentCreator.getContents().forEach(contentDao::add);
+
+        programDao.addProgramToChannel(1L, 1L);
+        programDao.addProgramToChannel(2L, 2L);
+        programDao.addProgramToChannel(3L, 3L);
     }
 }

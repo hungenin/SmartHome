@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/channels")
-public class ChannelRestController {
+@RequestMapping("/api/channels")
+public class ChannelApiController {
     @Autowired
     private ChannelService channelService;
 

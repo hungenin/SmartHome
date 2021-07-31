@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/contents")
-public class ContentRestController {
+@RequestMapping("/api/contents")
+public class ContentApiController {
     @Autowired
     private ContentService contentService;
 

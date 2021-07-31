@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/tv_guide")
-public class TvGuideRestController {
+@RequestMapping("/api/tv_guide")
+public class TvGuideApiController {
     @Autowired
     private TvGuideService tvGuideService;
 

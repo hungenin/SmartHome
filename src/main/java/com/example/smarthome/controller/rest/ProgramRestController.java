@@ -34,7 +34,7 @@ public class ProgramRestController {
         programService.delete(Program.builder().id(id).build());
     }
 
-    @RequestMapping
+    @GetMapping
     public List<Program> programs() {
         return programService.programs();
     }

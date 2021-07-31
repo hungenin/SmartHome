@@ -42,7 +42,7 @@ public class ProgramController {
         return "redirect:/programs";
     }
 
-    @RequestMapping
+    @GetMapping
     public String programs(Model model) {
         model.addAttribute("programs", programService.programs());
 

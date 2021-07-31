@@ -29,15 +29,14 @@ public class ContentController {
 
     @PutMapping("/{id}")
     public String update(@PathVariable Long id, @RequestBody Content content) {
-        content.setId(id);
-        contentService.update(content);
+        contentService.update(id, content);
 
         return "redirect:/contents";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
-        contentService.delete(Content.builder().id(id).build());
+        contentService.delete(id);
 
         return "redirect:/contents";
     }

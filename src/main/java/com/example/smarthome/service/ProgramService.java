@@ -20,12 +20,13 @@ public class ProgramService {
         return programDao.get(id);
     }
 
-    public void update(Program program) {
+    public void update(Long id, Program program) {
+        program.setId(id);
         programDao.update(program);
     }
 
-    public void delete(Program program) {
-        programDao.delete(program);
+    public void delete(Long id) {
+        programDao.delete(Program.builder().id(id).build());
     }
 
     public List<Program> programs() {

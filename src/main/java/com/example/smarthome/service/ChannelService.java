@@ -20,12 +20,13 @@ public class ChannelService {
         return channelDao.get(id);
     }
 
-    public void update(Channel channel) {
+    public void update(Long id, Channel channel) {
+        channel.setId(id);
         channelDao.update(channel);
     }
 
-    public void delete(Channel channel) {
-        channelDao.delete(channel);
+    public void delete(Long id) {
+        channelDao.delete(Channel.builder().id(id).build());
     }
 
     public List<Channel> channels() {
@@ -36,7 +37,10 @@ public class ChannelService {
         return channelDao.followedChannels();
     }
 
-    public void setFollow(Channel channel) {
-        channelDao.setFollow(channel);
+    public void setFollow(Long id) {
+        channelDao.setFollow(Channel.builder().id(id).follow(true).build());
+    }
+    public void setUnFollow(Long id) {
+        channelDao.setFollow(Channel.builder().id(id).follow(false).build());
     }
 }

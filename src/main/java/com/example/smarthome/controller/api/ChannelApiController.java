@@ -24,13 +24,12 @@ public class ChannelApiController {
 
     @PutMapping("/{id}")
     public void update(@PathVariable Long id, @RequestBody Channel channel) {
-        channel.setId(id);
-        channelService.update(channel);
+        channelService.update(id ,channel);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        channelService.delete(Channel.builder().id(id).build());
+        channelService.delete(id);
     }
 
     @GetMapping
@@ -38,13 +37,13 @@ public class ChannelApiController {
         return channelService.channels();
     }
 
-    @GetMapping("/{channelId}/follow")
-    public void setFollow(@PathVariable Long channelId) {
-        channelService.setFollow(Channel.builder().id(channelId).follow(true).build());
+    @GetMapping("/{id}/follow")
+    public void setFollow(@PathVariable Long id) {
+        channelService.setFollow(id);
     }
 
-    @GetMapping("/{channelId}/unfollow")
-    public void setUnfollow(@PathVariable Long channelId) {
-        channelService.setFollow(Channel.builder().id(channelId).follow(false).build());
+    @GetMapping("/{id}/unfollow")
+    public void setUnfollow(@PathVariable Long id) {
+        channelService.setUnFollow(id);
     }
 }

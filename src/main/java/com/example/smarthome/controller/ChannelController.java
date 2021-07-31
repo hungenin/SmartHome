@@ -29,15 +29,14 @@ public class ChannelController {
 
     @PutMapping("/{id}")
     public String update(@PathVariable Long id, @RequestBody Channel channel) {
-        channel.setId(id);
-        channelService.update(channel);
+        channelService.update(id, channel);
 
         return "redirect:/channels";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
-        channelService.delete(Channel.builder().id(id).build());
+        channelService.delete(id);
 
         return "redirect:/channels";
     }
@@ -49,16 +48,16 @@ public class ChannelController {
         return "channels";
     }
 
-    @GetMapping("/{channelId}/follow")
-    public String setFollow(@PathVariable Long channelId) {
-        channelService.setFollow(Channel.builder().id(channelId).follow(true).build());
+    @GetMapping("/{id}/follow")
+    public String setFollow(@PathVariable Long id) {
+        channelService.setFollow(id);
 
         return "redirect:/channels";
     }
 
-    @GetMapping("/{channelId}/unfollow")
-    public String setUnfollow(@PathVariable Long channelId) {
-        channelService.setFollow(Channel.builder().id(channelId).follow(false).build());
+    @GetMapping("/{id}/unfollow")
+    public String setUnfollow(@PathVariable Long id) {
+        channelService.setUnFollow(id);
 
         return "redirect:/channels";
     }

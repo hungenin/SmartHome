@@ -29,15 +29,14 @@ public class ProgramController {
 
     @PutMapping("/{id}")
     public String update(@PathVariable Long id, @RequestBody Program program) {
-        program.setId(id);
-        programService.update(program);
+        programService.update(id, program);
 
         return "redirect:/programs";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id) {
-        programService.delete(Program.builder().id(id).build());
+        programService.delete(id);
 
         return "redirect:/programs";
     }

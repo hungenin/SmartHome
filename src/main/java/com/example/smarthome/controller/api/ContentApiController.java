@@ -24,13 +24,12 @@ public class ContentApiController {
 
     @PutMapping("/{id}")
     public void update(@PathVariable Long id, @RequestBody Content content) {
-        content.setId(id);
-        contentService.update(content);
+        contentService.update(id, content);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        contentService.delete(Content.builder().id(id).build());
+        contentService.delete(id);
     }
 
     @GetMapping

@@ -25,13 +25,12 @@ public class ProgramApiController {
 
     @PutMapping("/{id}")
     public void update(@PathVariable Long id, @RequestBody Program program) {
-        program.setId(id);
-        programService.update(program);
+        programService.update(id, program);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        programService.delete(Program.builder().id(id).build());
+        programService.delete(id);
     }
 
     @GetMapping

@@ -20,12 +20,13 @@ public class ContentService {
         return contentDao.get(id);
     }
 
-    public void update(Content content) {
+    public void update(Long id, Content content) {
+        content.setId(id);
         contentDao.update(content);
     }
 
-    public void delete(Content content) {
-        contentDao.delete(content);
+    public void delete(Long id) {
+        contentDao.delete(Content.builder().id(id).build());
     }
 
     public List<Content> contents() {

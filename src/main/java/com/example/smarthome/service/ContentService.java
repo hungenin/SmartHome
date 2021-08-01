@@ -15,6 +15,7 @@ public class ContentService {
     private ContentDao contentDao;
 
     public void add(Content content) {
+        content.setId(null);
         contentDao.add(content);
     }
 

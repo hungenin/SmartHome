@@ -15,6 +15,7 @@ public class ChannelService {
     private ChannelDao channelDao;
 
     public void add(Channel channel) {
+        channel.setId(null);
         channelDao.add(channel);
     }
 

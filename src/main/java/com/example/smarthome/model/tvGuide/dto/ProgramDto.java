@@ -23,5 +23,6 @@ public class ProgramDto {
         id = program.getId();
         start = program.getStart();
         end = program.getEnd();
+        content = program.getContent();
     }
 }

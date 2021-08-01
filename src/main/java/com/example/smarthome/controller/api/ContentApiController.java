@@ -1,6 +1,7 @@
 package com.example.smarthome.controller.api;
 
 import com.example.smarthome.model.tvGuide.Content;
+import com.example.smarthome.model.tvGuide.dto.ContentDto;
 import com.example.smarthome.service.ContentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class ContentApiController {
     }
 
     @GetMapping("/{id}")
-    public Content get(@PathVariable Long id) {
+    public ContentDto get(@PathVariable Long id) {
         return contentService.get(id);
     }
 
@@ -33,7 +34,7 @@ public class ContentApiController {
     }
 
     @GetMapping
-    public List<Content> contents() {
+    public List<ContentDto> contents() {
         return contentService.contents();
     }
 }

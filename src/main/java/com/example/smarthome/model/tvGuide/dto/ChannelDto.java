@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder(toBuilder = true)
@@ -29,5 +30,6 @@ public class ChannelDto {
         id = channel.getId();
         name = channel.getName();
         follow = channel.getFollow();
+        programs = channel.getPrograms() == null ? null : channel.getPrograms().stream().map(ProgramDto::new).collect(Collectors.toList());
     }
 }

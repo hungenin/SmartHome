@@ -1,6 +1,7 @@
 package com.example.smarthome.controller.api;
 
 import com.example.smarthome.model.tvGuide.Program;
+import com.example.smarthome.model.tvGuide.dto.ProgramDto;
 import com.example.smarthome.service.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class ProgramApiController {
     }
 
     @GetMapping("/{id}")
-    public Program get(@PathVariable Long id) {
+    public ProgramDto get(@PathVariable Long id) {
         return programService.get(id);
     }
 
@@ -34,7 +35,7 @@ public class ProgramApiController {
     }
 
     @GetMapping
-    public List<Program> programs() {
+    public List<ProgramDto> programs() {
         return programService.programs();
     }
 }

@@ -1,6 +1,7 @@
 package com.example.smarthome.controller.api;
 
 import com.example.smarthome.model.tvGuide.Channel;
+import com.example.smarthome.model.tvGuide.dto.ChannelDto;
 import com.example.smarthome.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class ChannelApiController {
     }
 
     @GetMapping("/{id}")
-    public Channel get(@PathVariable Long id) {
+    public ChannelDto get(@PathVariable Long id) {
         return channelService.get(id);
     }
 
@@ -33,7 +34,7 @@ public class ChannelApiController {
     }
 
     @GetMapping
-    public List<Channel> channels() {
+    public List<ChannelDto> channels() {
         return channelService.channels();
     }
 

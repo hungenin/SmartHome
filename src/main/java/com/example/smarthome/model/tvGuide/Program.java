@@ -1,5 +1,6 @@
 package com.example.smarthome.model.tvGuide;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,9 +9,11 @@ import java.time.LocalDateTime;
 @Data
 @Builder(toBuilder = true)
 public class Program implements Comparable<Program> {
-    Long id;
-    LocalDateTime start;
-    LocalDateTime end;
+    private Long id;
+    private LocalDateTime start;
+    private LocalDateTime end;
+    private Content content;
+    private Channel channel;
 
     @Override
     public boolean equals(Object object) {
@@ -18,7 +21,7 @@ public class Program implements Comparable<Program> {
         if (object == null || getClass() != object.getClass()) return false;
 
         Program program = (Program) object;
-        return id.equals(program.id);
+        return id != null && id.equals(program.id);
     }
 
     @Override

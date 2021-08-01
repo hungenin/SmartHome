@@ -3,7 +3,6 @@ package com.example.smarthome.dao.implementation.memory;
 import com.example.smarthome.dao.ChannelDao;
 import com.example.smarthome.model.tvGuide.Channel;
 import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -38,12 +37,13 @@ public class ChannelDaoMemory implements ChannelDao {
                 .forEach(channel1 -> {
                     channel1.setName(channel.getName());
                     channel1.setFollow(channel.getFollow());
+                    channel1.setPrograms(channel.getPrograms());
                 });
     }
 
     @Override
     public void delete(Channel channel) {
-        channels.removeIf(channel::equals);
+        channels.removeIf(channel1 -> channel1.equals(channel) && (channel1.getPrograms() == null || channel1.getPrograms().size() == 0));
     }
 
     @Override

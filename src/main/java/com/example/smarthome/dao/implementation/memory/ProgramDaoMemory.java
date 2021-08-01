@@ -3,7 +3,6 @@ package com.example.smarthome.dao.implementation.memory;
 import com.example.smarthome.dao.ProgramDao;
 import com.example.smarthome.model.tvGuide.Program;
 import org.springframework.stereotype.Repository;
-
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -43,6 +42,7 @@ public class ProgramDaoMemory implements ProgramDao {
 
     @Override
     public void delete(Program program) {
+        removeConnections(program);
         programs.removeIf(program::equals);
     }
 
@@ -68,5 +68,14 @@ public class ProgramDaoMemory implements ProgramDao {
                     .collect(Collectors.toList());
 
         return new ArrayList<>();
+    }
+
+    private void removeConnections(Program program) {
+        programs.stream()
+                .filter(program::equals)
+                .forEach(program1 -> {
+                    program1.getChannel().removeProgram(program1);
+                    program1.getContent().removeProgram(program1);
+                });
     }
 }

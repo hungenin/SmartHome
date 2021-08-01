@@ -2,10 +2,12 @@ package com.example.smarthome.service;
 
 import com.example.smarthome.dao.ChannelDao;
 import com.example.smarthome.model.tvGuide.Channel;
+import com.example.smarthome.model.tvGuide.dto.ChannelDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ChannelService {
@@ -16,8 +18,8 @@ public class ChannelService {
         channelDao.add(channel);
     }
 
-    public Channel get(Long id) {
-        return channelDao.get(id);
+    public ChannelDto get(Long id) {
+        return new ChannelDto(channelDao.get(id));
     }
 
     public void update(Long id, Channel channel) {
@@ -29,12 +31,12 @@ public class ChannelService {
         channelDao.delete(Channel.builder().id(id).build());
     }
 
-    public List<Channel> channels() {
-        return channelDao.channels();
+    public List<ChannelDto> channels() {
+        return channelDao.channels().stream().map(ChannelDto::new).collect(Collectors.toList());
     }
 
-    public List<Channel> followedChannels() {
-        return channelDao.followedChannels();
+    public List<ChannelDto> followedChannels() {
+        return channelDao.followedChannels().stream().map(ChannelDto::new).collect(Collectors.toList());
     }
 
     public void setFollow(Long id) {

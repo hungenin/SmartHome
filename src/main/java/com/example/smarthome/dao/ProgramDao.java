@@ -1,8 +1,6 @@
 package com.example.smarthome.dao;
 
 import com.example.smarthome.model.tvGuide.Program;
-import com.example.smarthome.model.tvGuide.dto.ProgramDto;
-
 import java.util.List;
 
 public interface ProgramDao {

@@ -3,7 +3,6 @@ package com.example.smarthome.dao.implementation.memory;
 import com.example.smarthome.dao.ContentDao;
 import com.example.smarthome.model.tvGuide.Content;
 import org.springframework.stereotype.Repository;
-
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -37,12 +36,13 @@ public class ContentDaoMemory implements ContentDao {
                 .forEach(content1 -> {
                     content1.setTitle(content.getTitle());
                     content1.setDescription(content.getDescription());
+                    content1.setPrograms(content.getPrograms());
                 });
     }
 
     @Override
     public void delete(Content content) {
-        contents.removeIf(content::equals);
+        contents.removeIf(content1 -> content1.equals(content) && (content1.getPrograms() == null || content1.getPrograms().size() == 0));
     }
 
     @Override

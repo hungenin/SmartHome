@@ -2,10 +2,12 @@ package com.example.smarthome.service;
 
 import com.example.smarthome.dao.ProgramDao;
 import com.example.smarthome.model.tvGuide.Program;
+import com.example.smarthome.model.tvGuide.dto.ProgramDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProgramService {
@@ -13,11 +15,12 @@ public class ProgramService {
     private ProgramDao programDao;
 
     public void add(Program program) {
+        program.setId(null);
         programDao.add(program);
     }
 
-    public Program get(Long id) {
-        return programDao.get(id);
+    public ProgramDto get(Long id) {
+        return new ProgramDto(programDao.get(id));
     }
 
     public void update(Long id, Program program) {
@@ -29,8 +32,8 @@ public class ProgramService {
         programDao.delete(Program.builder().id(id).build());
     }
 
-    public List<Program> programs() {
-        return programDao.programs();
+    public List<ProgramDto> programs() {
+        return programDao.programs().stream().map(ProgramDto::new).collect(Collectors.toList());
     }
 
     public List<Program> programsByChannel(Long id) {

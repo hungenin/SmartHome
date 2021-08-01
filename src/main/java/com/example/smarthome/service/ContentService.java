@@ -2,10 +2,12 @@ package com.example.smarthome.service;
 
 import com.example.smarthome.dao.ContentDao;
 import com.example.smarthome.model.tvGuide.Content;
+import com.example.smarthome.model.tvGuide.dto.ContentDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ContentService {
@@ -16,8 +18,8 @@ public class ContentService {
         contentDao.add(content);
     }
 
-    public Content get(Long id) {
-        return contentDao.get(id);
+    public ContentDto get(Long id) {
+        return new ContentDto(contentDao.get(id));
     }
 
     public void update(Long id, Content content) {
@@ -29,7 +31,7 @@ public class ContentService {
         contentDao.delete(Content.builder().id(id).build());
     }
 
-    public List<Content> contents() {
-        return contentDao.contents();
+    public List<ContentDto> contents() {
+        return contentDao.contents().stream().map(ContentDto::new).collect(Collectors.toList());
     }
 }

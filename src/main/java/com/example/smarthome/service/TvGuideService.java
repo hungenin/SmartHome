@@ -32,7 +32,7 @@ public class TvGuideService {
                         .id(channel.getId())
                         .name(channel.getName())
                         .follow(channel.getFollow())
-                        .programs(programDao.programsByChannel(channel.getId())
+                        .programs(channel.getPrograms()
                                 .stream()
                                 .map(ProgramDto::new)
                                 .collect(Collectors.toList()))

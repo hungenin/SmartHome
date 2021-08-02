@@ -35,8 +35,4 @@ public class ProgramService {
     public List<ProgramDto> programs() {
         return programDao.programs().stream().map(ProgramDto::new).collect(Collectors.toList());
     }
-
-    public List<Program> programsByChannel(Long id) {
-        return programDao.programsByChannel(id);
-    }
 }

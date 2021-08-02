@@ -44,11 +44,5 @@ public class TvGuideService {
         ContentCreator.getContents().forEach(contentDao::add);
         ChannelCreator.getChannels().forEach(channelDao::add);
         ProgramCreator.getPrograms(contentDao.contents(), channelDao.channels()).forEach(programDao::add);
-
-
-
-        /*programDao.addProgramToChannel(1L, 1L);
-        programDao.addProgramToChannel(2L, 2L);
-        programDao.addProgramToChannel(3L, 3L);*/
     }
 }

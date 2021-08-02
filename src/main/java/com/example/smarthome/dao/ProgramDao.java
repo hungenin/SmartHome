@@ -9,7 +9,4 @@ public interface ProgramDao {
     void update(Program program);
     void delete(Program program);
     List<Program> programs();
-
-    void addProgramToChannel(Long programId, Long channelId);
-    List<Program> programsByChannel(Long id);
 }

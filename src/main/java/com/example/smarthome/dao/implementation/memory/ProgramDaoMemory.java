@@ -5,13 +5,11 @@ import com.example.smarthome.model.tvGuide.Program;
 import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 @Repository
 public class ProgramDaoMemory implements ProgramDao {
     private final AtomicLong idCounter = new AtomicLong(1);
     private final List<Program> programs = new ArrayList<>();
-    private final Map<Long , Set<Long>> channelIdToProgramIds = new HashMap<>();
 
     @Override
     public void add(Program program) {
@@ -49,25 +47,6 @@ public class ProgramDaoMemory implements ProgramDao {
     @Override
     public List<Program> programs() {
         return new ArrayList<>(programs);
-    }
-
-    @Override
-    public void addProgramToChannel(Long programId, Long channelId) {
-        if (!channelIdToProgramIds.containsKey(channelId)){
-            channelIdToProgramIds.put(channelId, new HashSet<>());
-        }
-        channelIdToProgramIds.get(channelId).add(programId);
-    }
-
-    @Override
-    public List<Program> programsByChannel(Long id) {
-        if (channelIdToProgramIds.containsKey(id))
-            return new ArrayList<>(channelIdToProgramIds.get(id))
-                    .stream()
-                    .map(this::get)
-                    .collect(Collectors.toList());
-
-        return new ArrayList<>();
     }
 
     private void removeConnections(Program program) {

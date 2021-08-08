@@ -3,6 +3,7 @@ package com.homeproject.smarthome.tvGuide.model;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Data
 @Builder(toBuilder = true)
@@ -19,7 +20,7 @@ public class Program implements Comparable<Program> {
         if (object == null || getClass() != object.getClass()) return false;
 
         Program program = (Program) object;
-        return id != null && id.equals(program.id);
+        return Objects.equals(id, program.id);
     }
 
     @Override

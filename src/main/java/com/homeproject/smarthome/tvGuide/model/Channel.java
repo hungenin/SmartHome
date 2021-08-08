@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @Builder(toBuilder = true)
@@ -29,6 +30,6 @@ public class Channel {
         if (object == null || getClass() != object.getClass()) return false;
 
         Channel channel = (Channel) object;
-        return id != null && id.equals(channel.id);
+        return Objects.equals(id, channel.id);
     }
 }

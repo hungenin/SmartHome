@@ -1,13 +1,18 @@
 package com.homeproject.smarthome.tvGuide.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Content {
     private Long id;
     private String title;
@@ -29,6 +34,6 @@ public class Content {
         if (object == null || getClass() != object.getClass()) return false;
 
         Content content = (Content) object;
-        return id != null && id.equals(content.id);
+        return Objects.equals(id, content.id);
     }
 }

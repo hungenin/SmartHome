@@ -14,8 +14,8 @@ public class ChannelApiController {
     private ChannelService channelService;
 
     @PostMapping
-    public void add(@RequestBody Channel channel) {
-        channelService.add(channel);
+    public ChannelDto add(@RequestBody Channel channel) {
+        return channelService.add(channel);
     }
 
     @GetMapping("/{id}")
@@ -24,8 +24,8 @@ public class ChannelApiController {
     }
 
     @PutMapping("/{id}")
-    public void update(@PathVariable Long id, @RequestBody Channel channel) {
-        channelService.update(id ,channel);
+    public ChannelDto update(@PathVariable Long id, @RequestBody Channel channel) {
+        return channelService.update(id ,channel);
     }
 
     @DeleteMapping("/{id}")

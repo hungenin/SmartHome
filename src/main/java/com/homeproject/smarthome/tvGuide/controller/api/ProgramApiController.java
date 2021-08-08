@@ -15,8 +15,8 @@ public class ProgramApiController {
     private ProgramService programService;
 
     @PostMapping
-    public void add(@RequestBody Program program) {
-        programService.add(program);
+    public ProgramDto add(@RequestBody Program program) {
+        return programService.add(program);
     }
 
     @GetMapping("/{id}")
@@ -25,8 +25,8 @@ public class ProgramApiController {
     }
 
     @PutMapping("/{id}")
-    public void update(@PathVariable Long id, @RequestBody Program program) {
-        programService.update(id, program);
+    public ProgramDto update(@PathVariable Long id, @RequestBody Program program) {
+        return programService.update(id, program);
     }
 
     @DeleteMapping("/{id}")

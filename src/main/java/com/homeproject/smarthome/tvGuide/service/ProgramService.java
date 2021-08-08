@@ -14,18 +14,18 @@ public class ProgramService {
     @Autowired
     private ProgramDao programDao;
 
-    public void add(Program program) {
+    public ProgramDto add(Program program) {
         program.setId(null);
-        programDao.add(program);
+        return new ProgramDto(programDao.add(program));
     }
 
     public ProgramDto get(Long id) {
         return new ProgramDto(programDao.get(id));
     }
 
-    public void update(Long id, Program program) {
+    public ProgramDto update(Long id, Program program) {
         program.setId(id);
-        programDao.update(program);
+        return new ProgramDto(programDao.update(program));
     }
 
     public void delete(Long id) {

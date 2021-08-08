@@ -14,18 +14,18 @@ public class ContentService {
     @Autowired
     private ContentDao contentDao;
 
-    public void add(Content content) {
+    public ContentDto add(Content content) {
         content.setId(null);
-        contentDao.add(content);
+        return new ContentDto(contentDao.add(content));
     }
 
     public ContentDto get(Long id) {
         return new ContentDto(contentDao.get(id));
     }
 
-    public void update(Long id, Content content) {
+    public ContentDto update(Long id, Content content) {
         content.setId(id);
-        contentDao.update(content);
+        return new ContentDto(contentDao.update(content));
     }
 
     public void delete(Long id) {

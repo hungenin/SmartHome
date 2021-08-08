@@ -14,18 +14,18 @@ public class ChannelService {
     @Autowired
     private ChannelDao channelDao;
 
-    public void add(Channel channel) {
+    public ChannelDto add(Channel channel) {
         channel.setId(null);
-        channelDao.add(channel);
+        return new ChannelDto(channelDao.add(channel));
     }
 
     public ChannelDto get(Long id) {
         return new ChannelDto(channelDao.get(id));
     }
 
-    public void update(Long id, Channel channel) {
+    public ChannelDto update(Long id, Channel channel) {
         channel.setId(id);
-        channelDao.update(channel);
+        return new ChannelDto(channelDao.update(channel));
     }
 
     public void delete(Long id) {

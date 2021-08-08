@@ -13,11 +13,13 @@ public class ContentDaoMemory implements ContentDao {
     private final Map<Long, Set<Long>> contentIdToProgramIds = new HashMap<>();
 
     @Override
-    public void add(Content content) {
+    public Content add(Content content) {
         if (content.getId() == null || !contents.contains(content)){
             content.setId(idCounter.getAndIncrement());
             contents.add(content.toBuilder().build());
         }
+
+        return content;
     }
 
     @Override
@@ -30,7 +32,7 @@ public class ContentDaoMemory implements ContentDao {
     }
 
     @Override
-    public void update(Content content) {
+    public Content update(Content content) {
         contents.stream()
                 .filter(content::equals)
                 .forEach(content1 -> {
@@ -38,6 +40,8 @@ public class ContentDaoMemory implements ContentDao {
                     content1.setDescription(content.getDescription());
                     content1.setPrograms(content.getPrograms());
                 });
+
+        return content;
     }
 
     @Override

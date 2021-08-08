@@ -12,11 +12,13 @@ public class ProgramDaoMemory implements ProgramDao {
     private final List<Program> programs = new ArrayList<>();
 
     @Override
-    public void add(Program program) {
+    public Program add(Program program) {
         if (program.getId() == null || !programs.contains(program)){
             program.setId(idCounter.getAndIncrement());
             programs.add(program.toBuilder().build());
         }
+
+        return program;
     }
 
     @Override
@@ -29,13 +31,15 @@ public class ProgramDaoMemory implements ProgramDao {
     }
 
     @Override
-    public void update(Program program) {
+    public Program update(Program program) {
         programs.stream()
                 .filter(program::equals)
                 .forEach(program1 -> {
                     program1.setStart(program.getStart());
                     program1.setEnd(program.getEnd());
                 });
+
+        return program;
     }
 
     @Override

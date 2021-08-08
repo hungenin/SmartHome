@@ -5,9 +5,9 @@ import com.homeproject.smarthome.tvGuide.model.Content;
 import java.util.List;
 
 public interface ContentDao {
-    void add(Content content);
+    Content add(Content content);
     Content get(Long id);
-    void update(Content content);
+    Content update(Content content);
     void delete(Content content);
     List<Content> contents();
 

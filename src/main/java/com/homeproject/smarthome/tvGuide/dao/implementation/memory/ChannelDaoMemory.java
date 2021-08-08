@@ -14,11 +14,13 @@ public class ChannelDaoMemory implements ChannelDao {
     private final List<Channel> channels = new ArrayList<>();
 
     @Override
-    public void add(Channel channel) {
+    public Channel add(Channel channel) {
         if (channel.getId() == null || !channels.contains(channel)){
             channel.setId(idCounter.getAndIncrement());
             channels.add(channel.toBuilder().build());
         }
+
+        return channel;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class ChannelDaoMemory implements ChannelDao {
     }
 
     @Override
-    public void update(Channel channel) {
+    public Channel update(Channel channel) {
         channels.stream()
                 .filter(channel::equals)
                 .forEach(channel1 -> {
@@ -39,6 +41,8 @@ public class ChannelDaoMemory implements ChannelDao {
                     channel1.setFollow(channel.getFollow());
                     channel1.setPrograms(channel.getPrograms());
                 });
+
+        return channel;
     }
 
     @Override

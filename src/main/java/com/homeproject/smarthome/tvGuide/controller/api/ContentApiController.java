@@ -14,8 +14,8 @@ public class ContentApiController {
     private ContentService contentService;
 
     @PostMapping
-    public void add(@RequestBody Content content) {
-        contentService.add(content);
+    public ContentDto add(@RequestBody Content content) {
+        return contentService.add(content);
     }
 
     @GetMapping("/{id}")

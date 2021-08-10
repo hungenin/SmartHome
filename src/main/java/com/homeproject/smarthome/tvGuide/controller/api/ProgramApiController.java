@@ -1,12 +1,13 @@
 package com.homeproject.smarthome.tvGuide.controller.api;
 
 import com.homeproject.smarthome.tvGuide.model.Program;
-import com.homeproject.smarthome.tvGuide.model.dto.ProgramDto;
 import com.homeproject.smarthome.tvGuide.service.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import static com.homeproject.smarthome.tvGuide.response.HttpResponse.invalidDataResponse;
 
 @RestController
 @RequestMapping("/api/programs")
@@ -15,27 +16,34 @@ public class ProgramApiController {
     private ProgramService programService;
 
     @PostMapping
-    public ProgramDto add(@RequestBody Program program) {
-        return programService.add(program);
+    public ResponseEntity<?> add(@RequestBody Program program, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()){
+            return invalidDataResponse(bindingResult);
+        }
+        return ResponseEntity.ok(programService.add(program));
     }
 
     @GetMapping("/{id}")
-    public ProgramDto get(@PathVariable Long id) {
-        return programService.get(id);
+    public ResponseEntity<?> get(@PathVariable Long id) {
+        return ResponseEntity.ok(programService.get(id));
     }
 
     @PutMapping("/{id}")
-    public ProgramDto update(@PathVariable Long id, @RequestBody Program program) {
-        return programService.update(id, program);
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Program program, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()){
+            return invalidDataResponse(bindingResult);
+        }
+        return ResponseEntity.ok(programService.update(id, program));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         programService.delete(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    public List<ProgramDto> programs() {
-        return programService.programs();
+    public ResponseEntity<?> programs() {
+        return ResponseEntity.ok(programService.programs());
     }
 }

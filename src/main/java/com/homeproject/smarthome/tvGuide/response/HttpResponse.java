@@ -15,13 +15,6 @@ public abstract class HttpResponse {
                 .body("[" + jsonErrorObject(name, "id", String.valueOf(id), "Not found!") + "]");
     }
 
-    public static ResponseEntity<?> cannotBeDeletedResponse(String name, Long id) {
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body("[" + jsonErrorObject(name, "id", String.valueOf(id), "Not found!") + "]");
-    }
-
     public static ResponseEntity<?> invalidDataResponse(BindingResult bindingResult) {
         return ResponseEntity
                 .badRequest()

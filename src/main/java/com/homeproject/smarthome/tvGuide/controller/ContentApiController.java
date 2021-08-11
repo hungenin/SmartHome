@@ -1,6 +1,5 @@
-package com.homeproject.smarthome.tvGuide.controller.api;
+package com.homeproject.smarthome.tvGuide.controller;
 
-import com.homeproject.smarthome.tvGuide.exception.CannotBeDeletedException;
 import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvGuide.model.Content;
 import com.homeproject.smarthome.tvGuide.service.ContentService;
@@ -10,10 +9,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
-import static com.homeproject.smarthome.tvGuide.response.HttpResponse.*;
+import static com.homeproject.smarthome.tvGuide.response.HttpResponse.dataNotFoundByIdResponse;
+import static com.homeproject.smarthome.tvGuide.response.HttpResponse.invalidDataResponse;
 
 @RestController
-@RequestMapping("/api/contents")
+@RequestMapping("/contents")
 public class ContentApiController {
     @Autowired
     private ContentService contentService;
@@ -26,41 +26,39 @@ public class ContentApiController {
         return ResponseEntity.ok(contentService.add(content));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> get(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(contentService.get(id));
-        } catch (DataNotFoundException e) {
-            return dataNotFoundByIdResponse("Content", id);
-        }
-    }
-
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody Content content, BindingResult bindingResult) {
+    public ResponseEntity<?> updateById(@PathVariable Long id, @Valid @RequestBody Content content, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return invalidDataResponse(bindingResult);
         }
         try {
-            return ResponseEntity.ok(contentService.update(id, content));
+            return ResponseEntity.ok(contentService.updateById(id, content));
         } catch (DataNotFoundException e) {
             return dataNotFoundByIdResponse("Content", id);
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> findById(@PathVariable Long id) {
         try {
-            contentService.delete(id);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(contentService.findById(id));
         } catch (DataNotFoundException e) {
             return dataNotFoundByIdResponse("Content", id);
-        } catch (CannotBeDeletedException e) {
-            return cannotBeDeletedResponse("Content", id);
         }
     }
 
     @GetMapping
-    public ResponseEntity<?> contents() {
-        return ResponseEntity.ok(contentService.contents());
+    public ResponseEntity<?> findAll() {
+        return ResponseEntity.ok(contentService.findAll());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable Long id) {
+        try {
+            contentService.deleteById(id);
+            return ResponseEntity.ok().build();
+        } catch (DataNotFoundException e) {
+            return dataNotFoundByIdResponse("Content", id);
+        }
     }
 }

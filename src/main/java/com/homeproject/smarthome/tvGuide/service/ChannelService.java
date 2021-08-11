@@ -1,61 +1,47 @@
 package com.homeproject.smarthome.tvGuide.service;
 
-import com.homeproject.smarthome.tvGuide.dao.ChannelDao;
-import com.homeproject.smarthome.tvGuide.exception.CannotBeDeletedException;
 import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
+import com.homeproject.smarthome.tvGuide.dao.ChannelRepository;
 import com.homeproject.smarthome.tvGuide.model.Channel;
-import com.homeproject.smarthome.tvGuide.model.Content;
-import com.homeproject.smarthome.tvGuide.model.dto.ChannelDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ChannelService {
     @Autowired
-    private ChannelDao channelDao;
+    private ChannelRepository channelRepository;
 
-    public ChannelDto add(Channel channel) {
+    public Channel add(Channel channel) {
         channel.setId(null);
-        return new ChannelDto(channelDao.add(channel));
+        return channelRepository.save(channel);
     }
-
-    public ChannelDto get(Long id) {
-        return new ChannelDto(channelDao.get(id).orElseThrow(DataNotFoundException::new));
-    }
-
-    public ChannelDto update(Long id, Channel channel) {
-        if (channelDao.existsById(id)) {
+    
+    public Channel updateById(Long id, Channel channel) {
+        if (channelRepository.existsById(id)) {
             channel.setId(id);
-            return new ChannelDto(channelDao.update(channel));
+            return channelRepository.save(channel);
         } else {
             throw new DataNotFoundException();
         }
     }
 
-    public void delete(Long id) {
-        Channel channel = channelDao.get(id).orElseThrow(DataNotFoundException::new);
+    public Channel findById(Long id) {
+        return channelRepository.findById(id).orElseThrow(DataNotFoundException::new);
+    }
 
-        if (channel.getPrograms().isEmpty()) {
-            channelDao.delete(Channel.builder().id(id).build());
+    public List<Channel> findAll() {
+        List<Channel> list = new ArrayList<>();
+        channelRepository.findAll().forEach(list::add);
+        return list;
+    }
+
+    public void deleteById(Long id) {
+        if (channelRepository.existsById(id)) {
+            channelRepository.deleteById(id);
         } else {
-            throw new CannotBeDeletedException();
+            throw new DataNotFoundException();
         }
-    }
-
-    public List<ChannelDto> channels() {
-        return channelDao.channels().stream().map(ChannelDto::new).collect(Collectors.toList());
-    }
-
-    public List<ChannelDto> followedChannels() {
-        return channelDao.followedChannels().stream().map(ChannelDto::new).collect(Collectors.toList());
-    }
-
-    public void setFollow(Long id) {
-        channelDao.setFollow(Channel.builder().id(id).follow(true).build());
-    }
-    public void setUnFollow(Long id) {
-        channelDao.setFollow(Channel.builder().id(id).follow(false).build());
     }
 }

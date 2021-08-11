@@ -7,8 +7,8 @@
 <body>
 <div>
     <ul>
-        <li th:each="content : ${contents}">
-            <div th:text="${content.title} + ' - ' + ${content.description}"></div>
+        <li th:each="contentDto : ${contents}">
+            <div th:text="${contentDto.title} + ' - ' + ${contentDto.description}"></div>
         </li>
     </ul>
 </div>

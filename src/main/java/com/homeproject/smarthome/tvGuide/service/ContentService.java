@@ -1,49 +1,47 @@
 package com.homeproject.smarthome.tvGuide.service;
 
-import com.homeproject.smarthome.tvGuide.dao.ContentDao;
-import com.homeproject.smarthome.tvGuide.exception.CannotBeDeletedException;
 import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
+import com.homeproject.smarthome.tvGuide.dao.ContentRepository;
 import com.homeproject.smarthome.tvGuide.model.Content;
-import com.homeproject.smarthome.tvGuide.model.dto.ContentDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ContentService {
     @Autowired
-    private ContentDao contentDao;
+    private ContentRepository contentRepository;
 
-    public ContentDto add(Content content) {
+    public Content add(Content content) {
         content.setId(null);
-        return new ContentDto(contentDao.add(content));
+        return contentRepository.save(content);
     }
-
-    public ContentDto get(Long id) {
-        return new ContentDto(contentDao.get(id).orElseThrow(DataNotFoundException::new));
-    }
-
-    public ContentDto update(Long id, Content content) {
-        if (contentDao.existsById(id)) {
+    
+    public Content updateById(Long id, Content content) {
+        if (contentRepository.existsById(id)) {
             content.setId(id);
-            return new ContentDto(contentDao.update(content));
+            return contentRepository.save(content);
         } else {
             throw new DataNotFoundException();
         }
     }
 
-    public void delete(Long id) {
-        Content content = contentDao.get(id).orElseThrow(DataNotFoundException::new);
-
-        if (content.getPrograms().isEmpty()) {
-            contentDao.delete(Content.builder().id(id).build());
-        } else {
-            throw new CannotBeDeletedException();
-        }
+    public Content findById(Long id) {
+        return contentRepository.findById(id).orElseThrow(DataNotFoundException::new);
     }
 
-    public List<ContentDto> contents() {
-        return contentDao.contents().stream().map(ContentDto::new).collect(Collectors.toList());
+    public List<Content> findAll() {
+        List<Content> list = new ArrayList<>();
+        contentRepository.findAll().forEach(list::add);
+        return list;
+    }
+
+    public void deleteById(Long id) {
+        if (contentRepository.existsById(id)) {
+            contentRepository.deleteById(id);
+        } else {
+            throw new DataNotFoundException();
+        }
     }
 }

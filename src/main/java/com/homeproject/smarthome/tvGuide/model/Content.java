@@ -1,24 +1,28 @@
 package com.homeproject.smarthome.tvGuide.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Content {
     private Long id;
+    @NotNull
+    @NotBlank
     private String title;
+    @NotNull
+    @NotBlank
     private String description;
     @JsonIgnore
-    private List<Program> programs;
+    private List<Program> programs = new ArrayList<>();
 
     public void addProgram(Program program) {
         if (program != null && !programs.contains(program)) programs.add(program);

@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ContentDaoMemory implements ContentDao {
     private final AtomicLong idCounter = new AtomicLong(1);
     private final List<Content> contents = new ArrayList<>();
-    private final Map<Long, Set<Long>> contentIdToProgramIds = new HashMap<>();
 
     @Override
     public Content add(Content content) {
@@ -26,7 +25,6 @@ public class ContentDaoMemory implements ContentDao {
     public Content get(Long id) {
         return contents.stream()
                 .filter(content -> content.getId().equals(id))
-                .map(content -> content.toBuilder().build())
                 .findFirst()
                 .orElse(null);
     }
@@ -46,30 +44,11 @@ public class ContentDaoMemory implements ContentDao {
 
     @Override
     public void delete(Content content) {
-        contents.removeIf(content1 -> content1.equals(content) && (content1.getPrograms() == null || content1.getPrograms().size() == 0));
+        contents.removeIf(content1 -> content1.equals(content) && (content1.getPrograms() == null || content1.getPrograms().isEmpty()));
     }
 
     @Override
     public List<Content> contents() {
         return new ArrayList<>(contents);
-    }
-
-    @Override
-    public void addContentToProgram(Long contentId, Long programId) {
-        if (!contentIdToProgramIds.containsKey(contentId)){
-            contentIdToProgramIds.put(contentId, new HashSet<>());
-        }
-        contentIdToProgramIds.get(contentId).add(programId);
-    }
-
-    @Override
-    public Content contentByProgram(Long id) {
-        return contentIdToProgramIds.entrySet()
-                .stream()
-                .filter(longSetEntry -> longSetEntry.getValue().contains(id))
-                .map(Map.Entry::getKey)
-                .map(this::get)
-                .findFirst()
-                .orElse(null);
     }
 }

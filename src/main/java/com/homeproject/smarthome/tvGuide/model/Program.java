@@ -1,12 +1,15 @@
 package com.homeproject.smarthome.tvGuide.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Data
+@Getter
+@Setter
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class Program implements Comparable<Program> {
     private Long id;
     private LocalDateTime start;

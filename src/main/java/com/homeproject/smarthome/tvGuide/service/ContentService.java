@@ -1,6 +1,7 @@
 package com.homeproject.smarthome.tvGuide.service;
 
 import com.homeproject.smarthome.tvGuide.dao.ContentDao;
+import com.homeproject.smarthome.tvGuide.exception.CannotBeDeletedException;
 import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvGuide.model.Content;
 import com.homeproject.smarthome.tvGuide.model.dto.ContentDto;
@@ -33,10 +34,12 @@ public class ContentService {
     }
 
     public void delete(Long id) {
-        if (contentDao.existsById(id)) {
+        Content content = contentDao.get(id).orElseThrow(DataNotFoundException::new);
+
+        if (content.getPrograms().isEmpty()) {
             contentDao.delete(Content.builder().id(id).build());
         } else {
-            throw new DataNotFoundException();
+            throw new CannotBeDeletedException();
         }
     }
 

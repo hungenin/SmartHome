@@ -1,5 +1,6 @@
 package com.homeproject.smarthome.tvGuide.controller.api;
 
+import com.homeproject.smarthome.tvGuide.exception.CannotBeDeletedException;
 import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvGuide.model.Program;
 import com.homeproject.smarthome.tvGuide.service.ProgramService;
@@ -8,8 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import static com.homeproject.smarthome.tvGuide.response.HttpResponse.dataNotFoundByIdResponse;
-import static com.homeproject.smarthome.tvGuide.response.HttpResponse.invalidDataResponse;
+import static com.homeproject.smarthome.tvGuide.response.HttpResponse.*;
 
 @RestController
 @RequestMapping("/api/programs")
@@ -53,6 +53,8 @@ public class ProgramApiController {
             return ResponseEntity.ok().build();
         } catch (DataNotFoundException e) {
             return dataNotFoundByIdResponse("Program", id);
+        } catch (CannotBeDeletedException e) {
+            return cannotBeDeletedResponse("Program", id);
         }
     }
 

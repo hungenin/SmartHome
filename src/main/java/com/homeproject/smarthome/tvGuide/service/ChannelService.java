@@ -1,8 +1,10 @@
 package com.homeproject.smarthome.tvGuide.service;
 
 import com.homeproject.smarthome.tvGuide.dao.ChannelDao;
+import com.homeproject.smarthome.tvGuide.exception.CannotBeDeletedException;
 import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvGuide.model.Channel;
+import com.homeproject.smarthome.tvGuide.model.Content;
 import com.homeproject.smarthome.tvGuide.model.dto.ChannelDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,13 @@ public class ChannelService {
     }
 
     public void delete(Long id) {
-        channelDao.delete(Channel.builder().id(id).build());
+        Channel channel = channelDao.get(id).orElseThrow(DataNotFoundException::new);
+
+        if (channel.getPrograms().isEmpty()) {
+            channelDao.delete(Channel.builder().id(id).build());
+        } else {
+            throw new CannotBeDeletedException();
+        }
     }
 
     public List<ChannelDto> channels() {

@@ -3,6 +3,7 @@ package com.homeproject.smarthome.tvGuide.service;
 import com.homeproject.smarthome.tvGuide.dao.ChannelDao;
 import com.homeproject.smarthome.tvGuide.dao.ContentDao;
 import com.homeproject.smarthome.tvGuide.dao.ProgramDao;
+import com.homeproject.smarthome.tvGuide.exception.CannotBeDeletedException;
 import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvGuide.model.Channel;
 import com.homeproject.smarthome.tvGuide.model.Content;
@@ -49,7 +50,11 @@ public class ProgramService {
     }
 
     public void delete(Long id) {
-        programDao.delete(Program.builder().id(id).build());
+        if (programDao.existsById(id)) {
+            programDao.delete(Program.builder().id(id).build());
+        } else {
+            throw new DataNotFoundException();
+        }
     }
 
     public List<ProgramDto> programs() {

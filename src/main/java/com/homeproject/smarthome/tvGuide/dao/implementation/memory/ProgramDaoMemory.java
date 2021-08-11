@@ -22,12 +22,11 @@ public class ProgramDaoMemory implements ProgramDao {
     }
 
     @Override
-    public Program get(Long id) {
+    public Optional<Program> get(Long id) {
         return programs.stream()
                 .filter(program -> program.getId().equals(id))
                 .map(program -> program.toBuilder().build())
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -51,6 +50,14 @@ public class ProgramDaoMemory implements ProgramDao {
     @Override
     public List<Program> programs() {
         return new ArrayList<>(programs);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        for (Program program : programs) {
+            if (program.getId().equals(id)) return true;
+        }
+        return false;
     }
 
     private void removeConnections(Program program) {

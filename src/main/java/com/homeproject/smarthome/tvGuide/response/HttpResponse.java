@@ -8,6 +8,13 @@ import org.springframework.validation.ObjectError;
 import java.util.stream.Collectors;
 
 public abstract class HttpResponse {
+    public static ResponseEntity<?> dataNotFoundByIdResponse(String name, Long id) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("[" + jsonErrorObject(name, "id", String.valueOf(id), "Not found!") + "]");
+    }
+
     public static ResponseEntity<?> invalidDataResponse(BindingResult bindingResult) {
         return ResponseEntity
                 .badRequest()

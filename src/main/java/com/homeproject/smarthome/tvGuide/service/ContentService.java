@@ -1,11 +1,11 @@
 package com.homeproject.smarthome.tvGuide.service;
 
 import com.homeproject.smarthome.tvGuide.dao.ContentDao;
+import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvGuide.model.Content;
 import com.homeproject.smarthome.tvGuide.model.dto.ContentDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,16 +20,24 @@ public class ContentService {
     }
 
     public ContentDto get(Long id) {
-        return new ContentDto(contentDao.get(id));
+        return new ContentDto(contentDao.get(id).orElseThrow(DataNotFoundException::new));
     }
 
     public ContentDto update(Long id, Content content) {
-        content.setId(id);
-        return new ContentDto(contentDao.update(content));
+        if (contentDao.existsById(id)) {
+            content.setId(id);
+            return new ContentDto(contentDao.update(content));
+        } else {
+            throw new DataNotFoundException();
+        }
     }
 
     public void delete(Long id) {
-        contentDao.delete(Content.builder().id(id).build());
+        if (contentDao.existsById(id)) {
+            contentDao.delete(Content.builder().id(id).build());
+        } else {
+            throw new DataNotFoundException();
+        }
     }
 
     public List<ContentDto> contents() {

@@ -1,5 +1,6 @@
 package com.homeproject.smarthome.tvGuide.controller.api;
 
+import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvGuide.model.Channel;
 import com.homeproject.smarthome.tvGuide.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import static com.homeproject.smarthome.tvGuide.response.HttpResponse.dataNotFoundByIdResponse;
 import static com.homeproject.smarthome.tvGuide.response.HttpResponse.invalidDataResponse;
 
 @RestController
@@ -25,7 +27,11 @@ public class ChannelApiController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable Long id) {
-        return ResponseEntity.ok(channelService.get(id));
+        try {
+            return ResponseEntity.ok(channelService.get(id));
+        } catch (DataNotFoundException e) {
+            return dataNotFoundByIdResponse("Channel", id);
+        }
     }
 
     @PutMapping("/{id}")
@@ -33,13 +39,21 @@ public class ChannelApiController {
         if (bindingResult.hasErrors()){
             return invalidDataResponse(bindingResult);
         }
-        return ResponseEntity.ok(channelService.update(id ,channel));
+        try {
+            return ResponseEntity.ok(channelService.update(id ,channel));
+        } catch (DataNotFoundException e) {
+            return dataNotFoundByIdResponse("Channel", id);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        channelService.delete(id);
-        return ResponseEntity.ok().build();
+        try {
+            channelService.delete(id);
+            return ResponseEntity.ok().build();
+        } catch (DataNotFoundException e) {
+            return dataNotFoundByIdResponse("Channel", id);
+        }
     }
 
     @GetMapping
@@ -49,13 +63,21 @@ public class ChannelApiController {
 
     @GetMapping("/{id}/follow")
     public ResponseEntity<?> setFollow(@PathVariable Long id) {
-        channelService.setFollow(id);
-        return ResponseEntity.ok().build();
+        try {
+            channelService.setFollow(id);
+            return ResponseEntity.ok().build();
+        } catch (DataNotFoundException e) {
+            return dataNotFoundByIdResponse("Channel", id);
+        }
     }
 
     @GetMapping("/{id}/unfollow")
     public ResponseEntity<?> setUnfollow(@PathVariable Long id) {
-        channelService.setUnFollow(id);
-        return ResponseEntity.ok().build();
+        try {
+            channelService.setUnFollow(id);
+            return ResponseEntity.ok().build();
+        } catch (DataNotFoundException e) {
+            return dataNotFoundByIdResponse("Channel", id);
+        }
     }
 }

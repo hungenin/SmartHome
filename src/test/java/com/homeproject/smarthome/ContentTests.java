@@ -349,7 +349,7 @@ public class ContentTests {
 
     @Test
     public void getContentWithNonExistentId_noContent_shouldReturnNotFoundHttpStatus() {
-        final ResponseEntity<ContentDto> getResponse = testRestTemplate.getForEntity(baseUrl + "/100", ContentDto.class);
+        final ResponseEntity<Object> getResponse = testRestTemplate.getForEntity(baseUrl + "/100", Object.class);
 
         assertEquals(HttpStatus.NOT_FOUND, getResponse.getStatusCode());
     }
@@ -433,12 +433,12 @@ public class ContentTests {
     }
 
     @Test
-    public void deleteContentWithNonExistentId_oneContent_shouldReturnNofFoundHttpStatus() {
+    public void deleteContentWithNonExistentId_oneContent_shouldReturnNotFoundHttpStatus() {
         final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
         testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
 
         final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(testContent);
-        final ResponseEntity<ContentDto> deleteResponse = testRestTemplate.exchange(baseUrl + "/100", HttpMethod.DELETE, httpEntity, ContentDto.class);
+        final ResponseEntity<Object> deleteResponse = testRestTemplate.exchange(baseUrl + "/100", HttpMethod.DELETE, httpEntity, Object.class);
 
         assertEquals(HttpStatus.NOT_FOUND, deleteResponse.getStatusCode());
     }
@@ -463,7 +463,7 @@ public class ContentTests {
         testRestTemplate.postForObject("http://localhost:" + port + "/api/programs", testProgram, ProgramDto.class);
 
         final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(testContent);
-        final ResponseEntity<ContentDto> deleteResponse = testRestTemplate.exchange(baseUrl + "/" + contentResult.getId(), HttpMethod.DELETE, httpEntity, ContentDto.class);
+        final ResponseEntity<Object> deleteResponse = testRestTemplate.exchange(baseUrl + "/" + contentResult.getId(), HttpMethod.DELETE, httpEntity, Object.class);
 
         assertEquals(HttpStatus.CONFLICT, deleteResponse.getStatusCode());
     }

@@ -5,6 +5,7 @@ import com.homeproject.smarthome.tvGuide.model.Channel;
 import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -24,12 +25,11 @@ public class ChannelDaoMemory implements ChannelDao {
     }
 
     @Override
-    public Channel get(Long id) {
+    public Optional<Channel> get(Long id) {
         return channels.stream()
                 .filter(channel -> channel.getId().equals(id))
                 .map(channel -> channel.toBuilder().build())
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -53,6 +53,14 @@ public class ChannelDaoMemory implements ChannelDao {
     @Override
     public List<Channel> channels() {
         return new ArrayList<>(channels);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        for (Channel channel : channels) {
+            if (channel.getId().equals(id)) return true;
+        }
+        return false;
     }
 
     @Override

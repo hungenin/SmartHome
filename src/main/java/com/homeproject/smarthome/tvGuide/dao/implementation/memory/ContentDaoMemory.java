@@ -22,11 +22,10 @@ public class ContentDaoMemory implements ContentDao {
     }
 
     @Override
-    public Content get(Long id) {
+    public Optional<Content> get(Long id) {
         return contents.stream()
                 .filter(content -> content.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -50,5 +49,13 @@ public class ContentDaoMemory implements ContentDao {
     @Override
     public List<Content> contents() {
         return new ArrayList<>(contents);
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        for (Content content : contents) {
+            if (content.getId().equals(id)) return true;
+        }
+        return false;
     }
 }

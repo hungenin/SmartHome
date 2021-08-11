@@ -1,5 +1,6 @@
 package com.homeproject.smarthome.tvGuide.controller.api;
 
+import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvGuide.model.Content;
 import com.homeproject.smarthome.tvGuide.service.ContentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
+import static com.homeproject.smarthome.tvGuide.response.HttpResponse.dataNotFoundByIdResponse;
 import static com.homeproject.smarthome.tvGuide.response.HttpResponse.invalidDataResponse;
 
 @RestController
@@ -26,7 +28,11 @@ public class ContentApiController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable Long id) {
-        return ResponseEntity.ok(contentService.get(id));
+        try {
+            return ResponseEntity.ok(contentService.get(id));
+        } catch (DataNotFoundException e) {
+            return dataNotFoundByIdResponse("Content", id);
+        }
     }
 
     @PutMapping("/{id}")
@@ -34,13 +40,21 @@ public class ContentApiController {
         if (bindingResult.hasErrors()){
             return invalidDataResponse(bindingResult);
         }
-        return ResponseEntity.ok(contentService.update(id, content));
+        try {
+            return ResponseEntity.ok(contentService.update(id, content));
+        } catch (DataNotFoundException e) {
+            return dataNotFoundByIdResponse("Content", id);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        contentService.delete(id);
-        return ResponseEntity.ok().build();
+        try {
+            contentService.delete(id);
+            return ResponseEntity.ok().build();
+        } catch (DataNotFoundException e) {
+            return dataNotFoundByIdResponse("Content", id);
+        }
     }
 
     @GetMapping

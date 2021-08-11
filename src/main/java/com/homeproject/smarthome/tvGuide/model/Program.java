@@ -2,6 +2,7 @@ package com.homeproject.smarthome.tvGuide.model;
 
 import lombok.*;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -10,11 +11,16 @@ import java.util.Objects;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Program implements Comparable<Program> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime start;
     private LocalDateTime end;
+    @ManyToOne
     private Content content;
+    @ManyToOne
     private Channel channel;
 
     @Override

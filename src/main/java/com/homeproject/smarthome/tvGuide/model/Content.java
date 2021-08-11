@@ -2,6 +2,8 @@ package com.homeproject.smarthome.tvGuide.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -13,7 +15,10 @@ import java.util.Objects;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Content {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
     @NotBlank
@@ -22,6 +27,7 @@ public class Content {
     @NotBlank
     private String description;
     @JsonIgnore
+    @OneToMany(mappedBy = "content")
     private List<Program> programs = new ArrayList<>();
 
     public void addProgram(Program program) {

@@ -12,17 +12,24 @@ public class ProgramDaoMemory implements ProgramDao {
     private final List<Program> programs = new ArrayList<>();
 
     @Override
-    public Program add(Program program) {
+    public Program save(Program program) {
         if (program.getId() == null || !programs.contains(program)){
             program.setId(idCounter.getAndIncrement());
             programs.add(program.toBuilder().build());
+        } else {
+            programs.stream()
+                    .filter(program::equals)
+                    .forEach(program1 -> {
+                        program1.setStart(program.getStart());
+                        program1.setEnd(program.getEnd());
+                    });
         }
 
         return program;
     }
 
     @Override
-    public Optional<Program> get(Long id) {
+    public Optional<Program> findById(Long id) {
         return programs.stream()
                 .filter(program -> program.getId().equals(id))
                 .map(program -> program.toBuilder().build())
@@ -30,25 +37,13 @@ public class ProgramDaoMemory implements ProgramDao {
     }
 
     @Override
-    public Program update(Program program) {
-        programs.stream()
-                .filter(program::equals)
-                .forEach(program1 -> {
-                    program1.setStart(program.getStart());
-                    program1.setEnd(program.getEnd());
-                });
-
-        return program;
-    }
-
-    @Override
-    public void delete(Program program) {
+    public void deleteById(Program program) {
         removeConnections(program);
         programs.removeIf(program::equals);
     }
 
     @Override
-    public List<Program> programs() {
+    public List<Program> findAll() {
         return new ArrayList<>(programs);
     }
 

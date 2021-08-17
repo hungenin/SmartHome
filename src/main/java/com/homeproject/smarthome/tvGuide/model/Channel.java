@@ -13,7 +13,7 @@ import java.util.Objects;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "channel")
 public class Channel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

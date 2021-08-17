@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProgramDao {
-    Program add(Program program);
-    Optional<Program> get(Long id);
-    Program update(Program program);
-    void delete(Program program);
-    List<Program> programs();
+    Program save(Program program);
+    Optional<Program> findById(Long id);
+    void deleteById(Program program);
+    List<Program> findAll();
     boolean existsById(Long id);
 }

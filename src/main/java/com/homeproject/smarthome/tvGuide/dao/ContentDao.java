@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ContentDao {
-    Content add(Content content);
-    Optional<Content> get(Long id);
-    Content update(Content content);
-    void delete(Content content);
-    List<Content> contents();
+    Content save(Content content);
+    Optional<Content> findById(Long id);
+    void deleteById(Long id);
+    List<Content> findAll();
     boolean existsById(Long id);
 }

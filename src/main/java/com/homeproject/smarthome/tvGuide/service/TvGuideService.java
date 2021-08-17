@@ -24,7 +24,7 @@ public class TvGuideService {
     private ContentDao contentDao;
 
     public List<ChannelDto> followedChannelsWithPrograms() {
-        return channelDao.followedChannels().stream()
+        return channelDao.findChannelsByFollowEquals(true).stream()
                 .map(channel -> ChannelDto.builder()
                         .id(channel.getId())
                         .name(channel.getName())
@@ -38,8 +38,8 @@ public class TvGuideService {
     }
 
     public void init() {
-        ContentCreator.getContents().forEach(contentDao::add);
-        ChannelCreator.getChannels().forEach(channelDao::add);
-        ProgramCreator.getPrograms(contentDao.contents(), channelDao.channels()).forEach(programDao::add);
+        ContentCreator.getContents().forEach(contentDao::save);
+        ChannelCreator.getChannels().forEach(channelDao::save);
+        ProgramCreator.getPrograms(contentDao.findAll(), channelDao.findAll()).forEach(programDao::save);
     }
 }

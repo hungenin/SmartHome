@@ -17,33 +17,33 @@ public class ContentService {
 
     public ContentDto add(Content content) {
         content.setId(null);
-        return new ContentDto(contentDao.add(content));
+        return new ContentDto(contentDao.save(content));
     }
 
     public ContentDto get(Long id) {
-        return new ContentDto(contentDao.get(id).orElseThrow(DataNotFoundException::new));
+        return new ContentDto(contentDao.findById(id).orElseThrow(DataNotFoundException::new));
     }
 
     public ContentDto update(Long id, Content content) {
         if (contentDao.existsById(id)) {
             content.setId(id);
-            return new ContentDto(contentDao.update(content));
+            return new ContentDto(contentDao.save(content));
         } else {
             throw new DataNotFoundException();
         }
     }
 
     public void delete(Long id) {
-        Content content = contentDao.get(id).orElseThrow(DataNotFoundException::new);
+        Content content = contentDao.findById(id).orElseThrow(DataNotFoundException::new);
 
         if (content.getPrograms().isEmpty()) {
-            contentDao.delete(Content.builder().id(id).build());
+            contentDao.deleteById(id);
         } else {
             throw new CannotBeDeletedException();
         }
     }
 
     public List<ContentDto> contents() {
-        return contentDao.contents().stream().map(ContentDto::new).collect(Collectors.toList());
+        return contentDao.findAll().stream().map(ContentDto::new).collect(Collectors.toList());
     }
 }

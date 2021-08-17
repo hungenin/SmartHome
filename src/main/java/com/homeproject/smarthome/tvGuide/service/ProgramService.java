@@ -3,7 +3,6 @@ package com.homeproject.smarthome.tvGuide.service;
 import com.homeproject.smarthome.tvGuide.dao.ChannelDao;
 import com.homeproject.smarthome.tvGuide.dao.ContentDao;
 import com.homeproject.smarthome.tvGuide.dao.ProgramDao;
-import com.homeproject.smarthome.tvGuide.exception.CannotBeDeletedException;
 import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvGuide.model.Channel;
 import com.homeproject.smarthome.tvGuide.model.Content;
@@ -24,26 +23,26 @@ public class ProgramService {
     private ChannelDao channelDao;
 
     public ProgramDto add(Program program) {
-        Content content = contentDao.get(program.getContent().getId()).get();
+        Content content = contentDao.findById(program.getContent().getId()).get();
         program.setContent(content);
         if (!content.getPrograms().contains(program)) content.getPrograms().add(program);
 
-        Channel channel = channelDao.get(program.getChannel().getId()).get();
+        Channel channel = channelDao.findById(program.getChannel().getId()).get();
         program.setChannel(channel);
         if (!channel.getPrograms().contains(program)) channel.getPrograms().add(program);
 
         program.setId(null);
-        return new ProgramDto(programDao.add(program));
+        return new ProgramDto(programDao.save(program));
     }
 
     public ProgramDto get(Long id) {
-        return new ProgramDto(programDao.get(id).orElseThrow(DataNotFoundException::new));
+        return new ProgramDto(programDao.findById(id).orElseThrow(DataNotFoundException::new));
     }
 
     public ProgramDto update(Long id, Program program) {
         if (programDao.existsById(id)) {
             program.setId(id);
-            return new ProgramDto(programDao.update(program));
+            return new ProgramDto(programDao.save(program));
         } else {
             throw new DataNotFoundException();
         }
@@ -51,13 +50,13 @@ public class ProgramService {
 
     public void delete(Long id) {
         if (programDao.existsById(id)) {
-            programDao.delete(Program.builder().id(id).build());
+            programDao.deleteById(Program.builder().id(id).build());
         } else {
             throw new DataNotFoundException();
         }
     }
 
     public List<ProgramDto> programs() {
-        return programDao.programs().stream().map(ProgramDto::new).collect(Collectors.toList());
+        return programDao.findAll().stream().map(ProgramDto::new).collect(Collectors.toList());
     }
 }

@@ -12,42 +12,37 @@ public class ContentDaoMemory implements ContentDao {
     private final List<Content> contents = new ArrayList<>();
 
     @Override
-    public Content add(Content content) {
+    public Content save(Content content) {
         if (content.getId() == null || !contents.contains(content)){
             content.setId(idCounter.getAndIncrement());
             contents.add(content.toBuilder().build());
+        } else {
+            contents.stream()
+                    .filter(content::equals)
+                    .forEach(content1 -> {
+                        content1.setTitle(content.getTitle());
+                        content1.setDescription(content.getDescription());
+                        content1.setPrograms(content.getPrograms());
+                    });
         }
 
         return content;
     }
 
     @Override
-    public Optional<Content> get(Long id) {
+    public Optional<Content> findById(Long id) {
         return contents.stream()
                 .filter(content -> content.getId().equals(id))
                 .findFirst();
     }
 
     @Override
-    public Content update(Content content) {
-        contents.stream()
-                .filter(content::equals)
-                .forEach(content1 -> {
-                    content1.setTitle(content.getTitle());
-                    content1.setDescription(content.getDescription());
-                    content1.setPrograms(content.getPrograms());
-                });
-
-        return content;
+    public void deleteById(Long id) {
+        contents.removeIf(content -> content.getId().equals(id) && (content.getPrograms() == null || content.getPrograms().isEmpty()));
     }
 
     @Override
-    public void delete(Content content) {
-        contents.removeIf(content1 -> content1.equals(content) && (content1.getPrograms() == null || content1.getPrograms().isEmpty()));
-    }
-
-    @Override
-    public List<Content> contents() {
+    public List<Content> findAll() {
         return new ArrayList<>(contents);
     }
 

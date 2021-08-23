@@ -3,6 +3,7 @@ package com.homeproject.smarthome.tvGuide.model;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -16,11 +17,15 @@ public class Program implements Comparable<Program> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private LocalDateTime start;
+    @NotNull
     private LocalDateTime end;
     @ManyToOne
+    @NotNull
     private Content content;
     @ManyToOne
+    @NotNull
     private Channel channel;
 
     @Override

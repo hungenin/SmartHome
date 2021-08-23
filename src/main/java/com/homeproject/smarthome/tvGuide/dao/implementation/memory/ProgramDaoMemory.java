@@ -37,9 +37,12 @@ public class ProgramDaoMemory implements ProgramDao {
     }
 
     @Override
-    public void deleteById(Program program) {
-        removeConnections(program);
-        programs.removeIf(program::equals);
+    public void deleteById(Long id) {
+        programs.stream()
+                .filter(program -> program.getId().equals(id))
+                .forEach(this::removeConnections);
+
+        programs.removeIf(program -> program.getId().equals(id));
     }
 
     @Override

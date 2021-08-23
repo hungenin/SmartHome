@@ -15,6 +15,13 @@ public abstract class HttpResponse {
                 .body("[" + jsonErrorObject(name, "id", String.valueOf(id), "Not found!") + "]");
     }
 
+    public static ResponseEntity<?> dataNotFoundByIdResponse(String jsonObject) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("[" + jsonObject + "]");
+    }
+
     public static ResponseEntity<?> cannotBeDeletedResponse(String name, Long id) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
@@ -30,6 +37,14 @@ public abstract class HttpResponse {
                         .stream()
                         .map(HttpResponse::objectErrorToJsonObject)
                         .collect(Collectors.joining(", ")) + "]");
+    }
+
+    public static ResponseEntity<?> invalidDataResponse(String jsonObject) {
+        System.out.println(jsonObject);
+        return ResponseEntity
+                .badRequest()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("[" + jsonObject + "]");
     }
 
     private static String objectErrorToJsonObject(ObjectError error) {

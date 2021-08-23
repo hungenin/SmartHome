@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import javax.validation.Valid;
 
 import static com.homeproject.smarthome.tvGuide.response.HttpResponse.*;
 
@@ -18,7 +19,7 @@ public class ChannelApiController {
     private ChannelService channelService;
 
     @PostMapping
-    public ResponseEntity<?> add(@RequestBody Channel channel, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@Valid @RequestBody Channel channel, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return invalidDataResponse(bindingResult);
         }
@@ -35,7 +36,7 @@ public class ChannelApiController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Channel channel, BindingResult bindingResult) {
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody Channel channel, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return invalidDataResponse(bindingResult);
         }
@@ -53,6 +54,8 @@ public class ChannelApiController {
             return ResponseEntity.ok().build();
         } catch (DataNotFoundException e) {
             return dataNotFoundByIdResponse("Channel", id);
+        } catch (CannotBeDeletedException e) {
+            return cannotBeDeletedResponse("Channel", id);
         }
     }
 

@@ -1,13 +1,17 @@
 package com.homeproject.smarthome.tvGuide.controller.api;
 
+import com.homeproject.smarthome.tvGuide.exception.CannotBeAddedException;
 import com.homeproject.smarthome.tvGuide.exception.CannotBeDeletedException;
 import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
+import com.homeproject.smarthome.tvGuide.exception.InvalidDataException;
 import com.homeproject.smarthome.tvGuide.model.Program;
 import com.homeproject.smarthome.tvGuide.service.ProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 import static com.homeproject.smarthome.tvGuide.response.HttpResponse.*;
 
@@ -18,11 +22,17 @@ public class ProgramApiController {
     private ProgramService programService;
 
     @PostMapping
-    public ResponseEntity<?> add(@RequestBody Program program, BindingResult bindingResult) {
+    public ResponseEntity<?> add(@Valid @RequestBody Program program, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return invalidDataResponse(bindingResult);
         }
-        return ResponseEntity.ok(programService.add(program));
+        try {
+            return ResponseEntity.ok(programService.add(program));
+        } catch (InvalidDataException e) {
+            return invalidDataResponse(e.getMessage());
+        } catch (CannotBeAddedException e) {
+            return dataNotFoundByIdResponse(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
@@ -35,12 +45,16 @@ public class ProgramApiController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody Program program, BindingResult bindingResult) {
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody Program program, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             return invalidDataResponse(bindingResult);
         }
         try {
             return ResponseEntity.ok(programService.update(id, program));
+        } catch (InvalidDataException e) {
+            return invalidDataResponse(e.getMessage());
+        } catch (CannotBeAddedException e) {
+            return dataNotFoundByIdResponse(e.getMessage());
         } catch (DataNotFoundException e) {
             return dataNotFoundByIdResponse("Program", id);
         }

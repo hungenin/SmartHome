@@ -1,11 +1,11 @@
 package com.homeproject.smarthome;
 
-import com.homeproject.smarthome.testModel.Content;
-import com.homeproject.smarthome.testModel.Channel;
-import com.homeproject.smarthome.testModel.Program;
-import com.homeproject.smarthome.testModel.dto.ChannelDto;
-import com.homeproject.smarthome.testModel.dto.ContentDto;
-import com.homeproject.smarthome.testModel.dto.ProgramDto;
+import com.homeproject.smarthome.tvGuide.model.Content;
+import com.homeproject.smarthome.tvGuide.model.Channel;
+import com.homeproject.smarthome.tvGuide.model.Program;
+import com.homeproject.smarthome.tvGuide.model.dto.ChannelDto;
+import com.homeproject.smarthome.tvGuide.model.dto.ContentDto;
+import com.homeproject.smarthome.tvGuide.model.dto.ProgramDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +26,16 @@ public class ContentTests {
     @LocalServerPort
     private int port;
     private String baseUrl;
+    private static final Long NON_EXISTENT_ID = 100L;
+    private static final Content TEST_CONTENT = new Content(null, "Test content", "A movie about contents in test.", null);
+    private static final Content TEST_CONTENT_WITHOUT_TITLE = new Content(null, null, "A movie about contents in test.", null);
+    private static final Content TEST_CONTENT_WITH_INVALID_TITLE = new Content(null, "", "A movie about contents in test.", null);
+    private static final Content TEST_CONTENT_WITHOUT_DESCRIPTION = new Content(null, "Test content", null, null);
+    private static final Content TEST_CONTENT_WITH_INVALID_DESCRIPTION = new Content(null, "Test content", "", null);
+    private static final Content TEST_CONTENT_WITH_NON_EXISTENT_ID = new Content(NON_EXISTENT_ID, "Test content", "A movie about contents in test.", null);
+    private static final Content TEST_CONTENT_2 = new Content(null, "Test content 2", "Another movie about contents in test.", null);
+    private static final Content TEST_CONTENT_3 = new Content(null, "Test content 3", "And another movie about contents in test.", null);
+    private static final Channel TEST_CHANNEL = new Channel(null, "Test channel", false, null);
     @Autowired
     private TestRestTemplate testRestTemplate;
 
@@ -37,203 +47,166 @@ public class ContentTests {
 
     @Test
     public void addNewValidContent_noContent_shouldReturnOkHttpStatus() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ResponseEntity<ContentDto> postResponse = testRestTemplate.postForEntity(baseUrl, testContent, ContentDto.class);
+        assertEquals(HttpStatus.OK, postResponse(TEST_CONTENT, ContentDto.class).getStatusCode());
+    }
 
-        assertEquals(HttpStatus.OK, postResponse.getStatusCode());
+    @Test
+    public void addNewValidChannelWithoutTitle_noChannel_shouldReturnBadRequestHttpStatus() {
+        assertEquals(HttpStatus.BAD_REQUEST, postResponse(TEST_CONTENT_WITHOUT_TITLE, Object.class).getStatusCode());
     }
 
     @Test
     public void addNewValidContentWithInvalidTitle_noContent_shouldReturnBadRequestHttpStatus() {
-        final Content content = new Content(null, "", "description", null);
-        final ResponseEntity<Object> postResponse = testRestTemplate.postForEntity(baseUrl, content, Object.class);
+        assertEquals(HttpStatus.BAD_REQUEST, postResponse(TEST_CONTENT_WITH_INVALID_TITLE, Object.class).getStatusCode());
+    }
 
-        assertEquals(HttpStatus.BAD_REQUEST, postResponse.getStatusCode());
+    @Test
+    public void addNewValidChannelWithoutDescription_noChannel_shouldReturnBadRequestHttpStatus() {
+        assertEquals(HttpStatus.BAD_REQUEST, postResponse(TEST_CONTENT_WITHOUT_DESCRIPTION, Object.class).getStatusCode());
     }
 
     @Test
     public void addNewValidContentWithInvalidDescription_noContent_shouldReturnBadRequestHttpStatus() {
-        final Content content = new Content(null, "title", "", null);
-        final ResponseEntity<Object> postResponse = testRestTemplate.postForEntity(baseUrl, content, Object.class);
-
-        assertEquals(HttpStatus.BAD_REQUEST, postResponse.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, postResponse(TEST_CONTENT_WITH_INVALID_DESCRIPTION, Object.class).getStatusCode());
     }
 
     @Test
     public void addNewValidContent_noContent_shouldReturnSameContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
-
-        assertTrue(equalsWithoutId(new ContentDto(testContent), result));
+        assertTrue(equalsWithoutId(new ContentDto(TEST_CONTENT), testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class)));
     }
 
     @Test
-    public void addNewValidContentWithoutId_noContent_shouldReturnContentWithNotNullId() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
-
-        assertNotEquals(null, result.getId());
-    }
-
-    @Test
-    public void addNewValidContentWithNonExistentId_noContent_shouldReturnContentWithGeneratedId() {
-        final Content testContent = new Content(100L, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
-
-        assertEquals(1L, result.getId());
+    public void addNewValidContentWithoutId_noContent_shouldReturnContentWithNotNullGeneratedId() {
+        assertNotEquals(null, testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class).getId());
     }
 
     @Test
     public void addNewValidContentWithExistentId_oneContent_shouldReturnContentWithDifferentGeneratedId() {
-        final Content testContent1 = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, testContent1, ContentDto.class);
+        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        final Content testContent2 = new Content(result1.getId(), "Test content 2", "Another movie about contents in test.", null);
-        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, testContent2, ContentDto.class);
+        TEST_CONTENT_2.setId(result1.getId());
+        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT_2, ContentDto.class);
+        TEST_CONTENT_2.setId(null);
 
         assertFalse(equalsById(result1, result2));
     }
 
     @Test
     public void addTwoNewValidContent_noContent_shouldReturnContentsWithDifferentId() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-
-        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
-        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
-
-        assertFalse(equalsById(result1, result2));
+        assertFalse(equalsById(
+                testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class),
+                testRestTemplate.postForObject(baseUrl, TEST_CONTENT_2, ContentDto.class)
+        ));
     }
 
     @Test
     public void addTwoNewValidContent_noContent_shouldSaveTwoContents() {
-        final Content testContent1 = new Content(null, "Test content", "A movie about contents in test.", null);
-        final Content testContent2 = new Content(null, "Test content 2", "Another movie about contents in test.", null);
+        testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
+        testRestTemplate.postForObject(baseUrl, TEST_CONTENT_2, ContentDto.class);
 
-        testRestTemplate.postForObject(baseUrl, testContent1, ContentDto.class);
-        testRestTemplate.postForObject(baseUrl, testContent2, ContentDto.class);
-
-        final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
-        assertEquals(2, contents.size());
+        assertEquals(2, List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class)).size());
     }
 
     @Test
     public void addTwoNewValidContent_noContent_shouldSaveTwoContentsWithGoodData() {
-        final Content testContent1 = new Content(null, "Test content", "A movie about contents in test.", null);
-        final Content testContent2 = new Content(null, "Test content 2", "Another movie about contents in test.", null);
-
-        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, testContent1, ContentDto.class);
-        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, testContent2, ContentDto.class);
+        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
+        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT_2, ContentDto.class);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
-        assertTrue(contain(contents, result1));
-        assertTrue(contain(contents, result2));
+        assertAll(
+                () -> assertTrue(contain(contents, result1)),
+                () -> assertTrue(contain(contents, result2))
+        );
+    }
+
+    @Test
+    public void addNewValidContentWithoutTitle_noContent_shouldNotSaveContent() {
+        testRestTemplate.postForEntity(baseUrl, TEST_CONTENT_WITHOUT_TITLE, Object.class);
+
+        assertEquals(0, List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class)).size());
     }
 
     @Test
     public void addNewValidContentWithInvalidTitle_noContent_shouldNotSaveContent() {
-        final Content content = new Content(null, "", "description", null);
-        testRestTemplate.postForEntity(baseUrl, content, Object.class);
+        testRestTemplate.postForEntity(baseUrl, TEST_CONTENT_WITH_INVALID_TITLE, Object.class);
 
-        final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
+        assertEquals(0, List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class)).size());
+    }
 
-        assertEquals(0, contents.size());
+    @Test
+    public void addNewValidContentWithoutDescription_noContent_shouldNotSaveContent() {
+        testRestTemplate.postForEntity(baseUrl, TEST_CONTENT_WITHOUT_DESCRIPTION, Object.class);
+
+        assertEquals(0, List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class)).size());
     }
 
     @Test
     public void addNewValidContentWithInvalidDescription_noContent_shouldNotSaveContent() {
-        final Content content = new Content(null, "Test content", "", null);
-        testRestTemplate.postForEntity(baseUrl, content, Object.class);
+        testRestTemplate.postForEntity(baseUrl, TEST_CONTENT_WITH_INVALID_DESCRIPTION, Object.class);
 
-        final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
-
-        assertEquals(0, contents.size());
+        assertEquals(0, List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class)).size());
     }
 
 
     @Test
     public void updateValidContent_oneContent_shouldReturnOkHttpStatus() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        testContent.setTitle("New test content");
-        testContent.setDescription("A new movie about contents in test.");
+        assertEquals(HttpStatus.OK, putResponse(result.getId(), TEST_CONTENT_2, ContentDto.class).getStatusCode());
+    }
 
-        final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(testContent);
-        final ResponseEntity<ContentDto> putResponse = testRestTemplate.exchange(baseUrl + "/" + result.getId(), HttpMethod.PUT, httpEntity, ContentDto.class);
+    @Test
+    public void updateValidContentWithoutTitle_oneContent_shouldReturnBadRequestHttpStatus() {
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        assertEquals(HttpStatus.OK, putResponse.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, putResponse(result.getId(), TEST_CONTENT_WITHOUT_TITLE, Object.class).getStatusCode());
     }
 
     @Test
     public void updateValidContentWithInvalidTitle_oneContent_shouldReturnBadRequestHttpStatus() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        testContent.setTitle("");
-        testContent.setDescription("A new movie about contents in test.");
+        assertEquals(HttpStatus.BAD_REQUEST, putResponse(result.getId(), TEST_CONTENT_WITH_INVALID_TITLE, Object.class).getStatusCode());
+    }
 
-        final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(testContent);
-        final ResponseEntity<Object> putResponse = testRestTemplate.exchange(baseUrl + "/" + result.getId(), HttpMethod.PUT, httpEntity, Object.class);
+    @Test
+    public void updateValidContentWithoutDescription_oneContent_shouldReturnBadRequestHttpStatus() {
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        assertEquals(HttpStatus.BAD_REQUEST, putResponse.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, putResponse(result.getId(), TEST_CONTENT_WITHOUT_DESCRIPTION, Object.class).getStatusCode());
     }
 
     @Test
     public void updateValidContentWithInvalidDescription_oneContent_shouldReturnBadRequestHttpStatus() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        testContent.setTitle("New test content");
-        testContent.setDescription("");
-
-        final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(testContent);
-        final ResponseEntity<Object> putResponse = testRestTemplate.exchange(baseUrl + "/" + result.getId(), HttpMethod.PUT, httpEntity, Object.class);
-
-        assertEquals(HttpStatus.BAD_REQUEST, putResponse.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, putResponse(result.getId(), TEST_CONTENT_WITH_INVALID_DESCRIPTION, Object.class).getStatusCode());
     }
 
     @Test
     public void updateValidContentWithNonExistentId_oneContent_shouldReturnNotFoundHttpStatus() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        testContent.setTitle("New test content");
-        testContent.setDescription("A new movie about contents in test.");
-
-        final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(testContent);
-        final ResponseEntity<Object> putResponse = testRestTemplate.exchange(baseUrl + "/100", HttpMethod.PUT, httpEntity, Object.class);
-
-        assertEquals(HttpStatus.NOT_FOUND, putResponse.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, putResponse(NON_EXISTENT_ID, TEST_CONTENT_2, Object.class).getStatusCode());
     }
 
     @Test
     public void updateValidContentWithExistentId_oneContent_shouldReturnSameContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        testContent.setTitle("New test content");
-        testContent.setDescription("A new movie about contents in test.");
-        result.setTitle("New test content");
-        result.setDescription("A new movie about contents in test.");
+        copyContentToDto(TEST_CONTENT_2, result);
 
-        final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(testContent);
-        final ResponseEntity<ContentDto> putResponse = testRestTemplate.exchange(baseUrl + "/" + result.getId(), HttpMethod.PUT, httpEntity, ContentDto.class);
-
-        assertTrue(equalsWithId(result, putResponse.getBody()));
+        assertTrue(equalsWithId(result, putResponse(result.getId(), TEST_CONTENT_2, ContentDto.class).getBody()));
     }
 
     @Test
     public void updateValidContentWithExistentId_oneContent_shouldUpdateContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        testContent.setTitle("New test content");
-        testContent.setDescription("A new movie about contents in test.");
-        result.setTitle("New test content");
-        result.setDescription("A new movie about contents in test.");
+        copyContentToDto(TEST_CONTENT_2, result);
 
-        testRestTemplate.put(baseUrl + "/" + result.getId(), testContent);
+        testRestTemplate.put(baseUrl + "/" + result.getId(), TEST_CONTENT_2);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
@@ -242,18 +215,12 @@ public class ContentTests {
 
     @Test
     public void updateValidContentWithExistentId_twoContent_shouldUpdateContent() {
-        final Content testContent1 = new Content(null, "Test content", "A movie about contents in test.", null);
-        final Content testContent2 = new Content(null, "Test content 2", "Another movie about contents in test.", null);
+        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
+        testRestTemplate.postForObject(baseUrl, TEST_CONTENT_2, ContentDto.class);
 
-        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, testContent1, ContentDto.class);
-        testRestTemplate.postForObject(baseUrl, testContent2, ContentDto.class);
+        copyContentToDto(TEST_CONTENT_3, result1);
 
-        testContent1.setTitle("New test content");
-        testContent1.setDescription("A new movie about contents in test.");
-        result1.setTitle("New test content");
-        result1.setDescription("A new movie about contents in test.");
-
-        testRestTemplate.put(baseUrl + "/" + result1.getId(), testContent1);
+        testRestTemplate.put(baseUrl + "/" + result1.getId(), TEST_CONTENT_3);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
@@ -262,18 +229,12 @@ public class ContentTests {
 
     @Test
     public void updateValidContentWithExistentId_twoContent_otherContentShouldNotChange() {
-        final Content testContent1 = new Content(null, "Test content", "A movie about contents in test.", null);
-        final Content testContent2 = new Content(null, "Test content 2", "Another movie about contents in test.", null);
+        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
+        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT_2, ContentDto.class);
 
-        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, testContent1, ContentDto.class);
-        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, testContent2, ContentDto.class);
+        copyContentToDto(TEST_CONTENT_3, result1);
 
-        testContent1.setTitle("New test content");
-        testContent1.setDescription("A new movie about contents in test.");
-        result1.setTitle("New test content");
-        result1.setDescription("A new movie about contents in test.");
-
-        testRestTemplate.put(baseUrl + "/" + result1.getId(), testContent1);
+        testRestTemplate.put(baseUrl + "/" + result1.getId(), TEST_CONTENT_3);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
@@ -281,14 +242,32 @@ public class ContentTests {
     }
 
     @Test
+    public void updateValidContentWithoutTitle_oneContent_shouldNotUpdateContent() {
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
+
+        testRestTemplate.put(baseUrl + "/" + result.getId(), TEST_CONTENT_WITHOUT_TITLE);
+
+        final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
+
+        assertTrue(contain(contents, result));
+    }
+
+    @Test
     public void updateValidContentWithInvalidTitle_oneContent_shouldNotUpdateContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        testContent.setTitle("");
-        testContent.setDescription("A new movie about contents in test.");
+        testRestTemplate.put(baseUrl + "/" + result.getId(), TEST_CONTENT_WITH_INVALID_TITLE);
 
-        testRestTemplate.put(baseUrl + "/" + result.getId(), testContent);
+        final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
+
+        assertTrue(contain(contents, result));
+    }
+
+    @Test
+    public void updateValidContentWithoutDescription_oneContent_shouldNotUpdateContent() {
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
+
+        testRestTemplate.put(baseUrl + "/" + result.getId(), TEST_CONTENT_WITHOUT_DESCRIPTION);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
@@ -297,13 +276,9 @@ public class ContentTests {
 
     @Test
     public void updateValidContentWithInvalidDescription_oneContent_shouldNotUpdateContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        testContent.setTitle("New test content");
-        testContent.setDescription("");
-
-        testRestTemplate.put(baseUrl + "/" + result.getId(), testContent);
+        testRestTemplate.put(baseUrl + "/" + result.getId(), TEST_CONTENT_WITH_INVALID_DESCRIPTION);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
@@ -312,9 +287,7 @@ public class ContentTests {
 
     @Test
     public void updateValidContentWithNonExistentId_noContent_shouldNotAddContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-
-        testRestTemplate.put(baseUrl + "/100", testContent);
+        testRestTemplate.put(baseUrl + "/" + NON_EXISTENT_ID, TEST_CONTENT);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
@@ -323,13 +296,9 @@ public class ContentTests {
 
     @Test
     public void updateValidContentWithNonExistentId_oneContent_shouldNotUpdateContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        testContent.setTitle("New test content");
-        testContent.setDescription("A new movie about contents in test.");
-
-        testRestTemplate.put(baseUrl + "/100", testContent);
+        testRestTemplate.put(baseUrl + "/" + NON_EXISTENT_ID, TEST_CONTENT_2);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
@@ -339,25 +308,19 @@ public class ContentTests {
 
     @Test
     public void getContentWithExistentId_oneContent_shouldReturnOkHttpStatus() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        final ResponseEntity<ContentDto> getResponse = testRestTemplate.getForEntity(baseUrl + "/" + result.getId(), ContentDto.class);
-
-        assertEquals(HttpStatus.OK, getResponse.getStatusCode());
+        assertEquals(HttpStatus.OK, getResponse(result.getId(), ContentDto.class).getStatusCode());
     }
 
     @Test
     public void getContentWithNonExistentId_noContent_shouldReturnNotFoundHttpStatus() {
-        final ResponseEntity<Object> getResponse = testRestTemplate.getForEntity(baseUrl + "/100", Object.class);
-
-        assertEquals(HttpStatus.NOT_FOUND, getResponse.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, getResponse(NON_EXISTENT_ID, Object.class).getStatusCode());
     }
 
     @Test
     public void getContentWithExistentId_oneContent_shouldReturnSameContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
         final ContentDto getResult = testRestTemplate.getForObject(baseUrl + "/" + result.getId(), ContentDto.class);
 
@@ -366,13 +329,9 @@ public class ContentTests {
 
     @Test
     public void getContentWithExistentId_threeContent_shouldReturnGoodContent() {
-        final Content testContent1 = new Content(null, "Test content", "A movie about contents in test.", null);
-        final Content testContent2 = new Content(null, "Test content 2", "Another movie about contents in test.", null);
-        final Content testContent3 = new Content(null, "Test content 3", "And another movie about contents in test.", null);
-
-        testRestTemplate.postForObject(baseUrl, testContent1, ContentDto.class);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent2, ContentDto.class);
-        testRestTemplate.postForObject(baseUrl, testContent3, ContentDto.class);
+        testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT_2, ContentDto.class);
+        testRestTemplate.postForObject(baseUrl, TEST_CONTENT_3, ContentDto.class);
 
         final ContentDto getResult = testRestTemplate.getForObject(baseUrl + "/" + result.getId(), ContentDto.class);
 
@@ -382,168 +341,168 @@ public class ContentTests {
 
     @Test
     public void getAllContent_noContent_shouldReturnOkHttpStatus() {
-        final ResponseEntity<ContentDto[]> getResponse = testRestTemplate.getForEntity(baseUrl, ContentDto[].class);
-
-        assertEquals(HttpStatus.OK, getResponse.getStatusCode());
+        assertEquals(HttpStatus.OK, getResponse().getStatusCode());
     }
 
     @Test
     public void getAllContent_noContent_shouldReturnEmptyList() {
-        final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
-
-        assertEquals(0, contents.size());
+        assertEquals(0, List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class)).size());
     }
 
     @Test
     public void getAllContent_oneContent_shouldReturnListWithContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
-        assertEquals(1, contents.size());
-        assertTrue(contain(contents, result));
+        assertAll(
+                () -> assertEquals(1, contents.size()),
+                () -> assertTrue(contain(contents, result))
+        );
     }
 
     @Test
     public void getAllContent_twoContent_shouldReturnListWithContents() {
-        final Content content1 = new Content(null, "Test content", "A movie about contents in test.", null);
-        final Content content2 = new Content(null, "Test content 2", "Another movie about contents in test.", null);
-
-        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, content1, ContentDto.class);
-        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, content2, ContentDto.class);
+        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
+        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT_2, ContentDto.class);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
-        assertEquals(2, contents.size());
-        assertTrue(contain(contents, result1));
-        assertTrue(contain(contents, result2));
+        assertAll(
+                () -> assertEquals(2, contents.size()),
+                () -> assertTrue(contain(contents, result1)),
+                () -> assertTrue(contain(contents, result2))
+        );
     }
 
 
     @Test
     public void deleteContentWithExistentId_oneContent_shouldReturnOkHttpStatus() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(testContent);
-        final ResponseEntity<ContentDto> deleteResponse = testRestTemplate.exchange(baseUrl + "/" + result.getId(), HttpMethod.DELETE, httpEntity, ContentDto.class);
-
-        assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
+        assertEquals(HttpStatus.OK, deleteResponse(result.getId()).getStatusCode());
     }
 
     @Test
     public void deleteContentWithNonExistentId_oneContent_shouldReturnNotFoundHttpStatus() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(testContent);
-        final ResponseEntity<Object> deleteResponse = testRestTemplate.exchange(baseUrl + "/100", HttpMethod.DELETE, httpEntity, Object.class);
-
-        assertEquals(HttpStatus.NOT_FOUND, deleteResponse.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, deleteResponse(NON_EXISTENT_ID).getStatusCode());
     }
 
     @Test
     public void deleteContentWithExistentId_oneContentWithDependency_shouldReturnConflictHttpStatus() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto contentResult = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
-        testContent.setId(contentResult.getId());
-
-        final Channel testChannel = new Channel(null, "Test channel", false, null);
-        final ChannelDto channelResult = testRestTemplate.postForObject("http://localhost:" + port + "/api/channels", testChannel, ChannelDto.class);
-        testChannel.setId(channelResult.getId());
-
-        final Program testProgram = new Program(
-                null,
-                LocalDateTime.of(2021, 8, 11, 4, 0, 0),
-                LocalDateTime.of(2021, 8, 11, 4, 50, 0),
-                testContent,
-                testChannel
-        );
-        testRestTemplate.postForObject("http://localhost:" + port + "/api/programs", testProgram, ProgramDto.class);
-
-        final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(testContent);
-        final ResponseEntity<Object> deleteResponse = testRestTemplate.exchange(baseUrl + "/" + contentResult.getId(), HttpMethod.DELETE, httpEntity, Object.class);
-
-        assertEquals(HttpStatus.CONFLICT, deleteResponse.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, deleteResponse(generateAndPostProgramWithDependenciesAndGetContent().getId()).getStatusCode());
     }
 
     @Test
     public void deleteContent_oneContent_shouldNotRemainContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
         testRestTemplate.delete(baseUrl + "/" + result.getId());
 
-        final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
-
-        assertEquals(0, contents.size());
+        assertEquals(0, List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class)).size());
     }
 
     @Test
     public void deleteInnerContent_threeContent_shouldRemainGoodContents() {
-        final Content testContent1 = new Content(null, "Test content", "A movie about contents in test.", null);
-        final Content testContent2 = new Content(null, "Test content 2", "Another movie about contents in test.", null);
-        final Content testContent3 = new Content(null, "Test content 3", "And another movie about contents in test.", null);
-
-        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, testContent1, ContentDto.class);
-        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, testContent2, ContentDto.class);
-        final ContentDto result3 = testRestTemplate.postForObject(baseUrl, testContent3, ContentDto.class);
+        final ContentDto result1 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
+        final ContentDto result2 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT_2, ContentDto.class);
+        final ContentDto result3 = testRestTemplate.postForObject(baseUrl, TEST_CONTENT_3, ContentDto.class);
 
         testRestTemplate.delete(baseUrl + "/" + result2.getId());
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
-        assertEquals(2, contents.size());
-        assertTrue(contain(contents, result1));
-        assertTrue(contain(contents, result3));
+        assertAll(
+                () -> assertEquals(2, contents.size()),
+                () -> assertTrue(contain(contents, result1)),
+                () -> assertTrue(contain(contents, result3))
+        );
     }
 
     @Test
     public void deleteContentWithNonExistentId_oneContent_shouldNotDeleteContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto result = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
+        final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
-        testRestTemplate.delete(baseUrl + "/100");
+        testRestTemplate.delete(baseUrl + "/" + NON_EXISTENT_ID);
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
-        assertEquals(1, contents.size());
-        assertTrue(contain(contents, result));
+        assertAll(
+                () -> assertEquals(1, contents.size()),
+                () -> assertTrue(contain(contents, result))
+        );
     }
 
     @Test
     public void deleteContentWithExistentId_oneContentWithDependency_shouldNotDeleteContent() {
-        final Content testContent = new Content(null, "Test content", "A movie about contents in test.", null);
-        final ContentDto contentResult = testRestTemplate.postForObject(baseUrl, testContent, ContentDto.class);
-        testContent.setId(contentResult.getId());
-
-        final Channel testChannel = new Channel(null, "Test channel", false, null);
-        final ChannelDto channelResult = testRestTemplate.postForObject("http://localhost:" + port + "/api/channels", testChannel, ChannelDto.class);
-        testChannel.setId(channelResult.getId());
-
-        final Program testProgram = new Program(
-                null,
-                LocalDateTime.of(2021, 8, 11, 4, 0, 0),
-                LocalDateTime.of(2021, 8, 11, 4, 50, 0),
-                testContent,
-                testChannel
-        );
-        testRestTemplate.postForObject("http://localhost:" + port + "/api/programs", testProgram, ProgramDto.class);
+        ContentDto contentResult = generateAndPostProgramWithDependenciesAndGetContent();
 
         testRestTemplate.delete(baseUrl + "/" + contentResult.getId());
 
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
-        assertEquals(1, contents.size());
-        assertTrue(contain(contents, contentResult));
+        assertAll(
+                () -> assertEquals(1, contents.size()),
+                () -> assertTrue(contain(contents, contentResult))
+        );
     }
 
+
+    private <T> ResponseEntity<T> postResponse(Content content, Class<T> classType) {
+        return testRestTemplate.postForEntity(baseUrl, content, classType);
+    }
+
+    private <T> ResponseEntity<T> putResponse(Long id, Content content, Class<T> classType) {
+        final HttpEntity<Content> httpEntity = createHttpEntityWithMediaTypeJson(content);
+        return testRestTemplate.exchange(baseUrl + "/" + id, HttpMethod.PUT, httpEntity, classType);
+    }
+
+    private <T> ResponseEntity<T> getResponse(Long id, Class<T> classType) {
+        return testRestTemplate.getForEntity(baseUrl + "/" + id, classType);
+    }
+
+    private ResponseEntity<Object> getResponse() {
+        return testRestTemplate.getForEntity(baseUrl, Object.class);
+    }
+
+    private ResponseEntity<Object> deleteResponse(Long id) {
+        return testRestTemplate.exchange(baseUrl + "/" + id, HttpMethod.DELETE, null, Object.class);
+    }
 
     private HttpEntity<Content> createHttpEntityWithMediaTypeJson(Content content) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+
         return new HttpEntity<>(content, headers);
+    }
+
+    private ContentDto generateAndPostProgramWithDependenciesAndGetContent() {
+        final ContentDto contentResult = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
+        TEST_CONTENT.setId(contentResult.getId());
+
+        final ChannelDto channelResult = testRestTemplate.postForObject("http://localhost:" + port + "/api/channels", TEST_CHANNEL, ChannelDto.class);
+        TEST_CHANNEL.setId(channelResult.getId());
+
+        final Program testProgram = new Program(
+                null,
+                LocalDateTime.of(2021, 8, 11, 4, 0, 0),
+                LocalDateTime.of(2021, 8, 11, 4, 50, 0),
+                TEST_CONTENT,
+                TEST_CHANNEL
+        );
+        testRestTemplate.postForObject("http://localhost:" + port + "/api/programs", testProgram, ProgramDto.class);
+
+        TEST_CONTENT.setId(null);
+        TEST_CHANNEL.setId(null);
+
+        return contentResult;
+    }
+
+    private void copyContentToDto(Content content, ContentDto result) {
+        result.setTitle(content.getTitle());
+        result.setDescription(content.getDescription());
     }
 
     private boolean equalsById(ContentDto contentDto, Object object) {
@@ -552,9 +511,7 @@ public class ContentTests {
 
         ContentDto otherContentDto = (ContentDto) object;
 
-        if (!Objects.equals(contentDto.getId(), otherContentDto.getId())) return false;
-
-        return true;
+        return Objects.equals(contentDto.getId(), otherContentDto.getId());
     }
 
     private boolean equalsWithId(ContentDto contentDto, Object object) {
@@ -565,9 +522,7 @@ public class ContentTests {
 
         if (!Objects.equals(contentDto.getId(), otherContentDto.getId())) return false;
         if (!Objects.equals(contentDto.getTitle(), otherContentDto.getTitle())) return false;
-        if (!Objects.equals(contentDto.getDescription(), otherContentDto.getDescription())) return false;
-
-        return true;
+        return Objects.equals(contentDto.getDescription(), otherContentDto.getDescription());
     }
 
     private boolean equalsWithoutId(ContentDto contentDto, Object object) {
@@ -577,9 +532,7 @@ public class ContentTests {
         ContentDto otherContentDto = (ContentDto) object;
 
         if (!Objects.equals(contentDto.getTitle(), otherContentDto.getTitle())) return false;
-        if (!Objects.equals(contentDto.getDescription(), otherContentDto.getDescription())) return false;
-
-        return true;
+        return Objects.equals(contentDto.getDescription(), otherContentDto.getDescription());
     }
 
     private boolean contain(List<ContentDto> contents, ContentDto contentDto) {

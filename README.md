@@ -10,3 +10,7 @@ To run docker image, run:
 
     - run.bat on windows
     - run.sh on linux
+
+You can check server when run at:
+
+    http://localhost:8080/swagger-ui

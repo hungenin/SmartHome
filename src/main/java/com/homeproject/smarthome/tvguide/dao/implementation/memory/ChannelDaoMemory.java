@@ -71,4 +71,15 @@ public class ChannelDaoMemory implements ChannelDao {
                 .filter(channel -> channel.getId().equals(id))
                 .forEach(channel -> channel.setFollow(follow));
     }
+
+    @Override
+    public Boolean existsChannelByPortIdEquals(Integer portId) {
+        //TODO
+        return false;
+    }
+
+    @Override
+    public Channel findChannelsByPortIdEquals(Integer portId) {
+        return null;
+    }
 }

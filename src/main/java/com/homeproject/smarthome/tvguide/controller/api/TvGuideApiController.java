@@ -19,6 +19,13 @@ public class TvGuideApiController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/update_data")
+    public ResponseEntity<?> updateData() {
+        tvGuideService.updateDataFromPortDotHu();
+
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
     public ResponseEntity<?> tvGuide() {
         return ResponseEntity.ok(tvGuideService.followedChannelsWithPrograms());

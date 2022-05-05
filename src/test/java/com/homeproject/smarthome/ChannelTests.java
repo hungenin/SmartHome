@@ -1,11 +1,11 @@
 package com.homeproject.smarthome;
 
-import com.homeproject.smarthome.tvGuide.model.Content;
-import com.homeproject.smarthome.tvGuide.model.Program;
-import com.homeproject.smarthome.tvGuide.model.dto.ChannelDto;
-import com.homeproject.smarthome.tvGuide.model.dto.ContentDto;
-import com.homeproject.smarthome.tvGuide.model.dto.ProgramDto;
-import com.homeproject.smarthome.tvGuide.model.Channel;
+import com.homeproject.smarthome.tvguide.model.Content;
+import com.homeproject.smarthome.tvguide.model.Program;
+import com.homeproject.smarthome.tvguide.model.dto.ChannelDto;
+import com.homeproject.smarthome.tvguide.model.dto.ContentDto;
+import com.homeproject.smarthome.tvguide.model.dto.ProgramDto;
+import com.homeproject.smarthome.tvguide.model.Channel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +27,13 @@ public class ChannelTests {
     private int port;
     private String baseUrl;
     private static final Long NON_EXISTENT_ID = 100L;
-    private static final Channel TEST_CHANNEL = new Channel(null, "Test channel", false, null);
-    private static final Channel TEST_CHANNEL_WITHOUT_NAME = new Channel(null, null, false, null);
-    private static final Channel TEST_CHANNEL_WITH_INVALID_NAME = new Channel(null, "", false, null);
-    private static final Channel TEST_CHANNEL_WITHOUT_FOLLOW = new Channel(null, "Test channel", null, null);
-    private static final Channel TEST_CHANNEL_WITH_NON_EXISTENT_ID = new Channel(NON_EXISTENT_ID, "Test channel", false, null);
-    private static final Channel TEST_CHANNEL_2 = new Channel(null, "Test channel 2", true, null);
-    private static final Channel TEST_CHANNEL_3 = new Channel(null, "Test channel 3", false, null);
+    private static final Channel TEST_CHANNEL = new Channel(null, "Test channel", null, false, null);
+    private static final Channel TEST_CHANNEL_WITHOUT_NAME = new Channel(null, null, null, false, null);
+    private static final Channel TEST_CHANNEL_WITH_INVALID_NAME = new Channel(null, "", null, false, null);
+    private static final Channel TEST_CHANNEL_WITHOUT_FOLLOW = new Channel(null, "Test channel", null, null, null);
+    private static final Channel TEST_CHANNEL_WITH_NON_EXISTENT_ID = new Channel(NON_EXISTENT_ID, "Test channel", null, false, null);
+    private static final Channel TEST_CHANNEL_2 = new Channel(null, "Test channel 2", null, true, null);
+    private static final Channel TEST_CHANNEL_3 = new Channel(null, "Test channel 3", null, false, null);
     private static final Content TEST_CONTENT = new Content(null, "Test content", "A movie about contents in test.", null);
     @Autowired
     private TestRestTemplate testRestTemplate;

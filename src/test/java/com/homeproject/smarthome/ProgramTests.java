@@ -1,11 +1,11 @@
 package com.homeproject.smarthome;
 
-import com.homeproject.smarthome.tvGuide.model.Channel;
-import com.homeproject.smarthome.tvGuide.model.Content;
-import com.homeproject.smarthome.tvGuide.model.Program;
-import com.homeproject.smarthome.tvGuide.model.dto.ChannelDto;
-import com.homeproject.smarthome.tvGuide.model.dto.ContentDto;
-import com.homeproject.smarthome.tvGuide.model.dto.ProgramDto;
+import com.homeproject.smarthome.tvguide.model.Channel;
+import com.homeproject.smarthome.tvguide.model.Content;
+import com.homeproject.smarthome.tvguide.model.Program;
+import com.homeproject.smarthome.tvguide.model.dto.ChannelDto;
+import com.homeproject.smarthome.tvguide.model.dto.ContentDto;
+import com.homeproject.smarthome.tvguide.model.dto.ProgramDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +37,8 @@ public class ProgramTests {
 
     private static final Content TEST_CONTENT = new Content(null, "Test content", "A movie about contents in test.", null);
     private static final Content TEST_CONTENT_WITH_NON_EXISTENT_ID = new Content(NON_EXISTENT_ID, "Test content", "A movie about contents in test.", null);
-    private static final Channel TEST_CHANNEL = new Channel(null, "Test channel", false, null);
-    private static final Channel TEST_CHANNEL_WITH_NON_EXISTENT_ID = new Channel(NON_EXISTENT_ID, "Test channel", false, null);
+    private static final Channel TEST_CHANNEL = new Channel(null, "Test channel", null, false, null);
+    private static final Channel TEST_CHANNEL_WITH_NON_EXISTENT_ID = new Channel(NON_EXISTENT_ID, "Test channel", null, false, null);
 
     private static final Program TEST_PROGRAM = new Program(null, START_TIME, END_TIME, TEST_CONTENT, TEST_CHANNEL);
     private static final Program TEST_PROGRAM_WITHOUT_START_TIME = new Program(null, null, END_TIME, TEST_CONTENT, TEST_CHANNEL);

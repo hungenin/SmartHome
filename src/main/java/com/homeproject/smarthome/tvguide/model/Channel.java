@@ -1,4 +1,4 @@
-package com.homeproject.smarthome.tvGuide.model;
+package com.homeproject.smarthome.tvguide.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
@@ -23,6 +23,9 @@ public class Channel {
     @NotBlank
     @NotNull
     private String name;
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private String logo;
     @NotNull
     private Boolean follow;
     @JsonIgnore

@@ -1,6 +1,6 @@
-package com.homeproject.smarthome.tvGuide.model.dto;
+package com.homeproject.smarthome.tvguide.model.dto;
 
-import com.homeproject.smarthome.tvGuide.model.Content;
+import com.homeproject.smarthome.tvguide.model.Content;
 import lombok.*;
 
 @Getter

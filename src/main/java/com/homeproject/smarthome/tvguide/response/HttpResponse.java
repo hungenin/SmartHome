@@ -1,4 +1,4 @@
-package com.homeproject.smarthome.tvGuide.response;
+package com.homeproject.smarthome.tvguide.response;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

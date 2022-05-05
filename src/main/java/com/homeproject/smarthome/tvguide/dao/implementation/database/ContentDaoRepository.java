@@ -1,7 +1,7 @@
-package com.homeproject.smarthome.tvGuide.dao.implementation.database;
+package com.homeproject.smarthome.tvguide.dao.implementation.database;
 
-import com.homeproject.smarthome.tvGuide.dao.ContentDao;
-import com.homeproject.smarthome.tvGuide.model.Content;
+import com.homeproject.smarthome.tvguide.dao.ContentDao;
+import com.homeproject.smarthome.tvguide.model.Content;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

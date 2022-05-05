@@ -1,4 +1,4 @@
-package com.homeproject.smarthome.tvGuide.model;
+package com.homeproject.smarthome.tvguide.model;
 
 import lombok.*;
 

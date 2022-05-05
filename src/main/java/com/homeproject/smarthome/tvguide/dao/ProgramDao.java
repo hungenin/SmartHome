@@ -1,6 +1,6 @@
-package com.homeproject.smarthome.tvGuide.dao;
+package com.homeproject.smarthome.tvguide.dao;
 
-import com.homeproject.smarthome.tvGuide.model.Program;
+import com.homeproject.smarthome.tvguide.model.Program;
 import java.util.List;
 import java.util.Optional;
 

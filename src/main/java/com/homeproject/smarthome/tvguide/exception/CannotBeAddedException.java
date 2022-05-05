@@ -1,4 +1,4 @@
-package com.homeproject.smarthome.tvGuide.exception;
+package com.homeproject.smarthome.tvguide.exception;
 
 public class CannotBeAddedException extends RuntimeException {
     public CannotBeAddedException() {

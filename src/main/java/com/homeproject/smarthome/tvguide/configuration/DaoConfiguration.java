@@ -1,14 +1,14 @@
-package com.homeproject.smarthome.tvGuide.configuration;
+package com.homeproject.smarthome.tvguide.configuration;
 
-import com.homeproject.smarthome.tvGuide.dao.ChannelDao;
-import com.homeproject.smarthome.tvGuide.dao.ContentDao;
-import com.homeproject.smarthome.tvGuide.dao.ProgramDao;
-import com.homeproject.smarthome.tvGuide.dao.implementation.database.ChannelDaoRepository;
-import com.homeproject.smarthome.tvGuide.dao.implementation.database.ContentDaoRepository;
-import com.homeproject.smarthome.tvGuide.dao.implementation.database.ProgramDaoRepository;
-import com.homeproject.smarthome.tvGuide.dao.implementation.memory.ChannelDaoMemory;
-import com.homeproject.smarthome.tvGuide.dao.implementation.memory.ContentDaoMemory;
-import com.homeproject.smarthome.tvGuide.dao.implementation.memory.ProgramDaoMemory;
+import com.homeproject.smarthome.tvguide.dao.ChannelDao;
+import com.homeproject.smarthome.tvguide.dao.ContentDao;
+import com.homeproject.smarthome.tvguide.dao.ProgramDao;
+import com.homeproject.smarthome.tvguide.dao.implementation.database.ChannelDaoRepository;
+import com.homeproject.smarthome.tvguide.dao.implementation.database.ContentDaoRepository;
+import com.homeproject.smarthome.tvguide.dao.implementation.database.ProgramDaoRepository;
+import com.homeproject.smarthome.tvguide.dao.implementation.memory.ChannelDaoMemory;
+import com.homeproject.smarthome.tvguide.dao.implementation.memory.ContentDaoMemory;
+import com.homeproject.smarthome.tvguide.dao.implementation.memory.ProgramDaoMemory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

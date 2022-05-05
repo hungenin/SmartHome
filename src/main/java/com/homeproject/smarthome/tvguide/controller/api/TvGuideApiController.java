@@ -1,30 +1,16 @@
-package com.homeproject.smarthome.tvGuide.controller.api;
+package com.homeproject.smarthome.tvguide.controller.api;
 
-import com.homeproject.smarthome.tvGuide.service.TvGuideService;
+import com.homeproject.smarthome.tvguide.service.TvGuideService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/tv_guide")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TvGuideApiController {
     @Autowired
     private TvGuideService tvGuideService;
-
-    @GetMapping("/init")
-    public ResponseEntity<?> init() {
-        tvGuideService.init();
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/update_data")
-    public ResponseEntity<?> updateData() {
-        tvGuideService.updateDataFromPortDotHu();
-
-        return ResponseEntity.ok().build();
-    }
 
     @GetMapping
     public ResponseEntity<?> tvGuide() {

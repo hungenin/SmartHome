@@ -1,30 +1,24 @@
-package com.homeproject.smarthome.tvGuide.controller.api;
+package com.homeproject.smarthome.tvguide.controller.api;
 
-import com.homeproject.smarthome.tvGuide.exception.CannotBeDeletedException;
-import com.homeproject.smarthome.tvGuide.exception.DataNotFoundException;
-import com.homeproject.smarthome.tvGuide.model.Content;
-import com.homeproject.smarthome.tvGuide.service.ContentService;
+import com.homeproject.smarthome.tvguide.exception.DataNotFoundException;
+import com.homeproject.smarthome.tvguide.model.Content;
+import com.homeproject.smarthome.tvguide.service.ContentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
-import static com.homeproject.smarthome.tvGuide.response.HttpResponse.*;
+import static com.homeproject.smarthome.tvguide.response.HttpResponse.*;
+
+// TODO: kivételkezelést átnézni, helyre rakni
 
 @RestController
-@RequestMapping("/api/contents")
+@RequestMapping("/api/tv_guide/contents")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ContentApiController {
     @Autowired
     private ContentService contentService;
-
-    @PostMapping
-    public ResponseEntity<?> add(@Valid @RequestBody Content content, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()){
-            return invalidDataResponse(bindingResult);
-        }
-        return ResponseEntity.ok(contentService.add(content));
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable Long id) {
@@ -44,18 +38,6 @@ public class ContentApiController {
             return ResponseEntity.ok(contentService.update(id, content));
         } catch (DataNotFoundException e) {
             return dataNotFoundByIdResponse("Content", id);
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        try {
-            contentService.delete(id);
-            return ResponseEntity.ok().build();
-        } catch (DataNotFoundException e) {
-            return dataNotFoundByIdResponse("Content", id);
-        } catch (CannotBeDeletedException e) {
-            return cannotBeDeletedResponse("Content", id);
         }
     }
 

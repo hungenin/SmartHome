@@ -1,7 +1,7 @@
-package com.homeproject.smarthome.tvGuide.dao.implementation.database;
+package com.homeproject.smarthome.tvguide.dao.implementation.database;
 
-import com.homeproject.smarthome.tvGuide.dao.ChannelDao;
-import com.homeproject.smarthome.tvGuide.model.Channel;
+import com.homeproject.smarthome.tvguide.dao.ChannelDao;
+import com.homeproject.smarthome.tvguide.model.Channel;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -21,4 +21,10 @@ public interface ChannelDaoRepository extends ChannelDao, CrudRepository<Channel
     @Modifying
     @Query("UPDATE channel c SET c.follow = ?2 WHERE c.id = ?1")
     void setFollow(Long id, boolean follow);
+
+    @Override
+    @Transactional
+    @Modifying
+    @Query("UPDATE channel c SET c.follow = ?1")
+    void setAllFollow(boolean follow);
 }

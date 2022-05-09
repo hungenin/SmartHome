@@ -14,3 +14,8 @@ To run docker image, run:
 You can check server when run at:
 
     http://localhost:8080/swagger-ui
+
+
+install:
+
+    - 

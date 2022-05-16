@@ -6,3 +6,6 @@ private/
 
 ### log files ###
 .logs/
+
+### database ###
+.database

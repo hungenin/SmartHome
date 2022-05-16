@@ -12,6 +12,7 @@ import com.homeproject.smarthome.tvguide.model.portdothu.Epg;
 import com.homeproject.smarthome.tvguide.model.Program;
 import com.homeproject.smarthome.tvguide.model.portdothu.PortChannel;
 import com.homeproject.smarthome.tvguide.model.portdothu.PortProgram;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -22,11 +23,11 @@ import java.util.*;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 
+@Log4j2
 @Service
 public class DataGrabberPortDotHu implements DataGrabber {
     private final static int PORT_ID_MAX_VALUE = 500;
     private final static String BASE_URL = "https://port.hu/tvapi?";
-    private final static String LOG_MESSAGE_BASE = " :: Data grabber (port.hu) - ";
 
     @Autowired
     private ChannelDao channelDao;
@@ -41,12 +42,12 @@ public class DataGrabberPortDotHu implements DataGrabber {
 
     @Override
     public void updateChannelList() {
-        System.err.println(LocalDateTime.now() + LOG_MESSAGE_BASE + "updating TV channels...");
+        log.info("Updating TV channels...");
 
         List<PortChannel> portChannels = discoverAvailableTvChannelsFromPortDotHu();
         updateExistedTvChannelsDataFromPortDotHuChannels(portChannels);
 
-        System.err.println(LocalDateTime.now() + LOG_MESSAGE_BASE + "TV channels up to date");
+        log.info("TV channels up to date.");
     }
 
     @Override
@@ -65,8 +66,8 @@ public class DataGrabberPortDotHu implements DataGrabber {
                             deleteOldProgramsFromChannel(channel);
                             createAndSaveProgramsToChannelFromPortChannels(channel, portChannel);
                         });
-                
-                System.err.println(portChannel.getName() + " refreshed");
+
+                log.info("Tv channel ({}) refreshed", portChannel.getName());
             });
         }
     }
@@ -82,7 +83,7 @@ public class DataGrabberPortDotHu implements DataGrabber {
                 deleteOldProgramsFromChannel(channel);
                 createAndSaveProgramsToChannelFromPortChannels(channel, epgData.getChannels().get(0));
 
-                System.err.println(epgData.getChannels().get(0).getName() + " refreshed");
+                log.info("Tv channel ({}) refreshed", epgData.getChannels().get(0).getName());
             }
         }
     }
@@ -119,14 +120,14 @@ public class DataGrabberPortDotHu implements DataGrabber {
                 final Epg epgData = restTemplate.getForObject(tvApiURL, Epg.class);
 
                 if (epgData == null || epgData.getChannels() == null) {
-                    System.err.println(LocalDateTime.now() + LOG_MESSAGE_BASE + "json object has probably changed. Cannot unpack to models. ( " + tvApiURL + " )");
+                    log.error("Epg json object has probably changed. Cannot unpack to models. ( " + tvApiURL + " )");
                 } else {
                     if (!epgData.getChannels().isEmpty()) {
                         portChannels.add(epgData.getChannels().get(0));
                     }
                 }
             } catch (RuntimeException e) {
-                System.err.println(LocalDateTime.now() + LOG_MESSAGE_BASE + getErrorMessageFromRestTemplateException(e.getMessage()) + " - ( " + tvApiURL + " )");
+                log.error(getErrorMessageFromRestTemplateException(e.getMessage()) + " - ( " + tvApiURL + " )");
             }
         }
 
@@ -161,11 +162,11 @@ public class DataGrabberPortDotHu implements DataGrabber {
                     channelDao.deleteById(channel.getId());
                     channelConnectorDao.deleteByChannelId(channel.getId());
 
-                    System.err.println(LocalDateTime.now() + LOG_MESSAGE_BASE + "channel has been removed from port.hu ( " + channel.getName() + " )");
+                    log.warn("Channel has been removed from port.hu. Delete channel ( " + channel.getName() + " )");
                 }
             } else {
                 channelDao.deleteById(channel.getId());
-                System.err.println(LocalDateTime.now() + LOG_MESSAGE_BASE + "channel connection not found. Delete channel ( " + channel.getName() + " )");
+                log.warn("Channel connection not found. Delete channel ( " + channel.getName() + " )");
             }
         }
 
@@ -184,7 +185,7 @@ public class DataGrabberPortDotHu implements DataGrabber {
         if (!channel.getName().equals(portChannel.getName())) {
             isUpdated = true;
 
-            System.err.println(LocalDateTime.now() + LOG_MESSAGE_BASE + "channel name updated ( " + channel.getName() + " -> " + portChannel.getName() + " )");
+            log.info("Channel name updated ( " + channel.getName() + " -> " + portChannel.getName() + " )");
             channel.setName(portChannel.getName());
         }
 
@@ -192,7 +193,7 @@ public class DataGrabberPortDotHu implements DataGrabber {
         if (!channel.getLogo().equals(logo)) {
             isUpdated = true;
 
-            System.err.println(LocalDateTime.now() + LOG_MESSAGE_BASE + "channel logo updated ( " + channel.getName() + " )");
+            log.info("Channel logo updated ( " + channel.getName() + " )");
             channel.setLogo(logo);
         }
 
@@ -228,6 +229,7 @@ public class DataGrabberPortDotHu implements DataGrabber {
         return null;
     }
 
+    // TODO hibadobás szebb
     private String generateBase64PreStringFromURL(String logoURL) {
         if (logoURL.endsWith("jpg") || logoURL.endsWith("jpeg")) {
             return "data:image/jpeg;base64,";
@@ -239,7 +241,7 @@ public class DataGrabberPortDotHu implements DataGrabber {
             return  "data:image/bmp;base64,";
         }
 
-        System.err.println(LocalDateTime.now() + LOG_MESSAGE_BASE + "error while downloading logo from port.hu! Unknown image format. ( " + logoURL + " )");
+        log.error("Can't download logo from port.hu! Unknown image format. ({})", logoURL);
         return "";
     }
 
@@ -257,7 +259,7 @@ public class DataGrabberPortDotHu implements DataGrabber {
 
         channelConnectorDao.save(channelConnector);
 
-        System.err.println(LocalDateTime.now() + LOG_MESSAGE_BASE + "new channel added ( " + channel.getName() + " )");
+        log.info("New TV channel added ({})", channel.getName());
     }
 
     private String generateTvApiURLByFollowedChannels() {

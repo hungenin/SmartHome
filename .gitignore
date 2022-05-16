@@ -1,4 +1,8 @@
 ### private stuff ###
 private/
 
+### idea files ###
 .idea/
+
+### log files ###
+.logs/

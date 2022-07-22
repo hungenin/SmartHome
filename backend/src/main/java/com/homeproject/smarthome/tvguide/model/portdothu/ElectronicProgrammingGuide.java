@@ -6,7 +6,7 @@ import java.util.List;
 
 @Setter
 @Getter
-public class Epg {
+public class ElectronicProgrammingGuide {
     private String date;
     private String date_from;
     private String date_to;

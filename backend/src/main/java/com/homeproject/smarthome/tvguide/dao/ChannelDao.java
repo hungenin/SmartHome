@@ -6,12 +6,12 @@ import java.util.Optional;
 
 public interface ChannelDao {
     Channel save(Channel channel);
-    Optional<Channel> findById(Long id);
-    void deleteById(Long id);
+    Optional<Channel> findById(Short id);
+    void deleteById(Short id);
     List<Channel> findAll();
-    boolean existsById(Long id);
+    boolean existsById(Short id);
 
     List<Channel> findChannelsByFollowEquals(boolean isFollow);
-    void setFollow(Long id, boolean follow);
+    void setFollow(Short id, boolean follow);
     void setAllFollow(boolean follow);
 }

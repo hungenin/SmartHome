@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface ChannelDaoRepository extends ChannelDao, CrudRepository<Channel, Long> {
+public interface ChannelDaoRepository extends ChannelDao, CrudRepository<Channel, Short> {
     @Override
     List<Channel> findAll();
 
@@ -20,7 +20,7 @@ public interface ChannelDaoRepository extends ChannelDao, CrudRepository<Channel
     @Transactional
     @Modifying
     @Query("UPDATE channel c SET c.follow = ?2 WHERE c.id = ?1")
-    void setFollow(Long id, boolean follow);
+    void setFollow(Short id, boolean follow);
 
     @Override
     @Transactional

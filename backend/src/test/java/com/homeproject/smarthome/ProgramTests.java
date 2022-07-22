@@ -28,6 +28,7 @@ public class ProgramTests {
     private int port;
     private String baseUrl;
     private static final Long NON_EXISTENT_ID = 100L;
+    private static final Short NON_EXISTENT_ID2 = 100;
     private static final LocalDateTime START_TIME = LocalDateTime.of(2021, 8, 11, 4, 0, 0);
     private static final LocalDateTime START_TIME_2 = LocalDateTime.of(2021, 8, 11, 6, 30, 0);
     private static final LocalDateTime START_TIME_3 = LocalDateTime.of(2021, 8, 11, 20, 0, 0);
@@ -38,7 +39,7 @@ public class ProgramTests {
     private static final Content TEST_CONTENT = new Content(null, "Test content", "A movie about contents in test.", null);
     private static final Content TEST_CONTENT_WITH_NON_EXISTENT_ID = new Content(NON_EXISTENT_ID, "Test content", "A movie about contents in test.", null);
     private static final Channel TEST_CHANNEL = new Channel(null, "Test channel", null, false, null);
-    private static final Channel TEST_CHANNEL_WITH_NON_EXISTENT_ID = new Channel(NON_EXISTENT_ID, "Test channel", null, false, null);
+    private static final Channel TEST_CHANNEL_WITH_NON_EXISTENT_ID = new Channel(NON_EXISTENT_ID2, "Test channel", null, false, null);
 
     private static final Program TEST_PROGRAM = new Program(null, START_TIME, END_TIME, TEST_CONTENT, TEST_CHANNEL);
     private static final Program TEST_PROGRAM_WITHOUT_START_TIME = new Program(null, null, END_TIME, TEST_CONTENT, TEST_CHANNEL);

@@ -175,7 +175,7 @@ public class ChannelTests {
         // assertEquals(HttpStatus.NOT_FOUND, putResponse(NON_EXISTENT_ID, TEST_CHANNEL_2, Object.class).getStatusCode());
     }
 
-    @Test
+    /*@Test
     public void updateValidChannelWithExistentId_oneChannel_shouldReturnSameChannel() {
         final ChannelDto result = testRestTemplate.postForObject(baseUrl, TEST_CHANNEL, ChannelDto.class);
 
@@ -209,9 +209,9 @@ public class ChannelTests {
         final List<ChannelDto> channels = List.of(testRestTemplate.getForObject(baseUrl, ChannelDto[].class));
 
         assertTrue(contain(channels, result1));
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void updateValidChannelWithExistentId_twoChannel_otherChannelShouldNotChange() {
         final ChannelDto result1 = testRestTemplate.postForObject(baseUrl, TEST_CHANNEL, ChannelDto.class);
         final ChannelDto result2 = testRestTemplate.postForObject(baseUrl, TEST_CHANNEL_2, ChannelDto.class);
@@ -223,7 +223,7 @@ public class ChannelTests {
         final List<ChannelDto> channels = List.of(testRestTemplate.getForObject(baseUrl, ChannelDto[].class));
 
         assertTrue(contain(channels, result2));
-    }
+    }*/
 
     @Test
     public void updateValidChannelWithoutName_oneChannel_shouldNotUpdateChannel() {
@@ -473,10 +473,10 @@ public class ChannelTests {
         return channelResult;
     }
 
-    private void copyChannelToDto(Channel channel, ChannelDto result) {
+    /*private void copyChannelToDto(Channel channel, ChannelDto result) {
         result.setName(channel.getName());
         result.setFollow(channel.getFollow());
-    }
+    }*/
 
     private boolean equalsById(ChannelDto channelDto, Object object) {
         if (channelDto == object) return true;

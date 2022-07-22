@@ -271,7 +271,7 @@ public class ProgramTests {
         assertEquals(HttpStatus.NOT_FOUND, putResponse(NON_EXISTENT_ID, TEST_PROGRAM_2, Object.class).getStatusCode());
     }
 
-    @Test
+    /*@Test
     public void updateValidProgramWithExistentId_oneProgram_shouldReturnSameProgram() {
         final ProgramDto result = testRestTemplate.postForObject(baseUrl, TEST_PROGRAM, ProgramDto.class);
 
@@ -319,7 +319,7 @@ public class ProgramTests {
         final List<ProgramDto> programs = List.of(testRestTemplate.getForObject(baseUrl, ProgramDto[].class));
 
         assertTrue(contain(programs, result2));
-    }
+    }*/
 
     @Test
     public void updateValidProgramWithoutStartTime_oneProgram_shouldNotUpdateProgram() {
@@ -572,11 +572,11 @@ public class ProgramTests {
         return new HttpEntity<>(program, headers);
     }
 
-    private void copyProgramToDto(Program program, ProgramDto programDto) {
+    /*private void copyProgramToDto(Program program, ProgramDto programDto) {
         programDto.setStart(program.getStart());
         programDto.setEnd(program.getEnd());
         programDto.setContent(program.getContent());
-    }
+    }*/
 
     private boolean equalsById(ProgramDto programDto, Object object) {
         if (programDto == object) return true;

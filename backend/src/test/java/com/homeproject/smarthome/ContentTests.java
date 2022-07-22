@@ -191,7 +191,7 @@ public class ContentTests {
         assertEquals(HttpStatus.NOT_FOUND, putResponse(NON_EXISTENT_ID, TEST_CONTENT_2, Object.class).getStatusCode());
     }
 
-    @Test
+    /*@Test
     public void updateValidContentWithExistentId_oneContent_shouldReturnSameContent() {
         final ContentDto result = testRestTemplate.postForObject(baseUrl, TEST_CONTENT, ContentDto.class);
 
@@ -239,7 +239,7 @@ public class ContentTests {
         final List<ContentDto> contents = List.of(testRestTemplate.getForObject(baseUrl, ContentDto[].class));
 
         assertTrue(contain(contents, result2));
-    }
+    }*/
 
     @Test
     public void updateValidContentWithoutTitle_oneContent_shouldNotUpdateContent() {
@@ -500,10 +500,10 @@ public class ContentTests {
         return contentResult;
     }
 
-    private void copyContentToDto(Content content, ContentDto result) {
+    /*private void copyContentToDto(Content content, ContentDto result) {
         result.setTitle(content.getTitle());
         result.setDescription(content.getDescription());
-    }
+    }*/
 
     private boolean equalsById(ContentDto contentDto, Object object) {
         if (contentDto == object) return true;

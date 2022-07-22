@@ -1,17 +1,13 @@
 package com.homeproject.smarthome.tvguide.model.dto;
 
 import com.homeproject.smarthome.tvguide.model.Content;
-import lombok.*;
+import lombok.Getter;
 
 @Getter
-@Setter
-@Builder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
 public class ContentDto {
-    private Long id;
-    private String title;
-    private String description;
+    private final Long id;
+    private final String title;
+    private final String description;
 
     public ContentDto(Content content) {
         id = content.getId();

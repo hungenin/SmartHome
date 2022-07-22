@@ -5,6 +5,6 @@ create table program (
     start timestamp not null,
     end timestamp not null,
     content_id bigint not null,
-    channel_id bigint not null,
+    channel_id smallint not null,
     primary key (id)
 );

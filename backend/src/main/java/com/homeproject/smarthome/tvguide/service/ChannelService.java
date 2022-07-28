@@ -1,7 +1,6 @@
 package com.homeproject.smarthome.tvguide.service;
 
 import com.homeproject.smarthome.tvguide.dao.ChannelDao;
-import com.homeproject.smarthome.tvguide.datagrabber.DataGrabber;
 import com.homeproject.smarthome.tvguide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvguide.model.Channel;
 import com.homeproject.smarthome.tvguide.model.dto.ChannelDto;
@@ -15,10 +14,13 @@ public class ChannelService {
     @Autowired
     private ChannelDao channelDao;
     @Autowired
-    private DataGrabber dataGrabber;
+    private TvGuideService tvGuideService;
 
-    public ChannelDto get(Long id) {
-        return new ChannelDto(channelDao.findById(id).orElseThrow(DataNotFoundException::new));
+    public ChannelDto get(Short id) {
+        return channelDao
+                .findById(id)
+                .map(ChannelDto::new)
+                .orElseThrow(DataNotFoundException::new);
     }
 
     public ChannelDto update(Channel channel) {
@@ -29,19 +31,24 @@ public class ChannelService {
         }
     }
 
-    public List<ChannelDto> channels() {
-        List<Channel> channels = channelDao.findAll();
-
-        if (channels.isEmpty()) {
-            dataGrabber.updateChannelList();
-            channels = channelDao.findAll();
-        }
-
-        return channels.stream().map(ChannelDto::new).collect(Collectors.toList());
+    public List<ChannelDto> channelsWithoutPrograms() throws RuntimeException{
+        return tvGuideService
+                .channelsWithoutPrograms()
+                .stream()
+                .map(ChannelDto::new)
+                .collect(Collectors.toList());
     }
 
-    public List<ChannelDto> followedChannels() {
-        return channelDao.findChannelsByFollowEquals(true).stream().map(ChannelDto::new).collect(Collectors.toList());
+    public List<ChannelDto> followedChannelsWithPrograms() {
+        return tvGuideService
+                .followedChannelsWithPrograms()
+                .stream()
+                .map(ChannelDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public void updateChannelList() {
+        tvGuideService.updateChannelListFromTvApiServer();
     }
 
     public void setAllFollow() {
@@ -49,9 +56,5 @@ public class ChannelService {
     }
     public void setAllUnFollow() {
         channelDao.setAllFollow(false);
-    }
-
-    public void updateChannelList() {
-        dataGrabber.updateChannelList();
     }
 }

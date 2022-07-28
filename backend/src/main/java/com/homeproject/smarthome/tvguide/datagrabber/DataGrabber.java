@@ -2,8 +2,10 @@ package com.homeproject.smarthome.tvguide.datagrabber;
 
 import com.homeproject.smarthome.tvguide.model.Channel;
 
+import java.util.List;
+
 public interface DataGrabber {
-    void updateChannelList();
-    void refreshChannels();
-    void refreshChannel(Channel channel);
+    List<Channel> getAvailableTvChannelsFromTvApiServer();
+    List<Channel> refreshChannelsPrograms(List<Channel> channels);
+    String getTvApiServerName();
 }

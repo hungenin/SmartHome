@@ -1,5 +1,6 @@
 package com.homeproject.smarthome.tvguide.controller.api;
 
+import com.homeproject.smarthome.tvguide.exception.CannotBeReadException;
 import com.homeproject.smarthome.tvguide.exception.DataNotFoundException;
 import com.homeproject.smarthome.tvguide.model.Channel;
 import com.homeproject.smarthome.tvguide.model.dto.ChannelDto;
@@ -9,11 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
-
 import static com.homeproject.smarthome.tvguide.response.HttpResponse.*;
-
-// TODO: kivételkezelést átnézni, helyre rakni
 
 @RestController
 @RequestMapping("/api/tv_guide/channels")
@@ -23,7 +22,7 @@ public class ChannelApiController {
     private ChannelService channelService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> get(@PathVariable Long id) {
+    public ResponseEntity<?> get(@PathVariable Short id) {
         try {
             return ResponseEntity.ok(channelService.get(id));
         } catch (DataNotFoundException e) {
@@ -39,13 +38,22 @@ public class ChannelApiController {
         try {
             return ResponseEntity.ok(channelService.update(channel));
         } catch (DataNotFoundException e) {
-            return dataNotFoundByIdResponse("Channel", 1L);
+            return dataNotFoundByIdResponse("Channel", (short) 1);
         }
     }
 
     @GetMapping
     public List<ChannelDto> channels() {
-        return channelService.channels();
+        try {
+            return channelService.channelsWithoutPrograms();
+        } catch (CannotBeReadException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    @GetMapping("/followed")
+    public ResponseEntity<?> followedChannelsWithPrograms() {
+        return ResponseEntity.ok(channelService.followedChannelsWithPrograms());
     }
 
     @PutMapping("/update")
@@ -69,4 +77,5 @@ public class ChannelApiController {
         return ResponseEntity.ok().build();
     }
 }
+
 

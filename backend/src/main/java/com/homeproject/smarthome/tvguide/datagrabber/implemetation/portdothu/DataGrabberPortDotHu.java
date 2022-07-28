@@ -1,14 +1,10 @@
 package com.homeproject.smarthome.tvguide.datagrabber.implemetation.portdothu;
 
-import com.homeproject.smarthome.tvguide.dao.ChannelConnectorDao;
-import com.homeproject.smarthome.tvguide.dao.ChannelDao;
-import com.homeproject.smarthome.tvguide.dao.ContentDao;
-import com.homeproject.smarthome.tvguide.dao.ProgramDao;
 import com.homeproject.smarthome.tvguide.datagrabber.DataGrabber;
+import com.homeproject.smarthome.tvguide.exception.UnknownFormatException;
 import com.homeproject.smarthome.tvguide.model.Channel;
-import com.homeproject.smarthome.tvguide.model.ChannelConnector;
 import com.homeproject.smarthome.tvguide.model.Content;
-import com.homeproject.smarthome.tvguide.model.portdothu.Epg;
+import com.homeproject.smarthome.tvguide.model.portdothu.ElectronicProgrammingGuide;
 import com.homeproject.smarthome.tvguide.model.Program;
 import com.homeproject.smarthome.tvguide.model.portdothu.PortChannel;
 import com.homeproject.smarthome.tvguide.model.portdothu.PortProgram;
@@ -26,190 +22,159 @@ import java.util.stream.Collectors;
 @Log4j2
 @Service
 public class DataGrabberPortDotHu implements DataGrabber {
+    private final static String TV_API_SERVER_NAME = "port.hu";
     private final static int PORT_ID_MAX_VALUE = 500;
     private final static String BASE_URL = "https://port.hu/tvapi?";
 
     @Autowired
-    private ChannelDao channelDao;
-    @Autowired
-    private ContentDao contentDao;
-    @Autowired
-    private ProgramDao programDao;
-    @Autowired
-    private ChannelConnectorDao channelConnectorDao;
-    @Autowired
     private RestTemplate restTemplate;
 
     @Override
-    public void updateChannelList() {
-        log.info("Updating TV channels...");
-
-        List<PortChannel> portChannels = discoverAvailableTvChannelsFromPortDotHu();
-        updateExistedTvChannelsDataFromPortDotHuChannels(portChannels);
-
-        log.info("TV channels up to date.");
-    }
-
-    @Override
-    public void refreshChannels() {
-        String tvApiURL = generateTvApiURLByFollowedChannels();
-
-        final Epg epgData = restTemplate.getForObject(tvApiURL, Epg.class);
-        if (epgData != null && epgData.getChannels() != null && !epgData.getChannels().isEmpty()) {
-            epgData.getChannels().forEach(portChannel -> {
-                int portId = Integer.parseInt(portChannel.getId().substring(10));
-
-                channelConnectorDao
-                        .findByPortId(portId)
-                        .flatMap(channelConnector -> channelDao.findById(channelConnector.getChannelId()))
-                        .ifPresent(channel -> {
-                            deleteOldProgramsFromChannel(channel);
-                            createAndSaveProgramsToChannelFromPortChannels(channel, portChannel);
-                        });
-
-                log.info("Tv channel ({}) refreshed", portChannel.getName());
-            });
-        }
-    }
-
-    @Override
-    public void refreshChannel(Channel channel) {
-        Optional<ChannelConnector> channelConnector = channelConnectorDao.findByChannelId(channel.getId());
-        if (channelConnector.isPresent()) {
-            String tvApiURL = generateTvApiURLByPortId(channelConnector.get().getPortId());
-
-            final Epg epgData = restTemplate.getForObject(tvApiURL, Epg.class);
-            if (epgData != null && epgData.getChannels() != null && !epgData.getChannels().isEmpty()) {
-                deleteOldProgramsFromChannel(channel);
-                createAndSaveProgramsToChannelFromPortChannels(channel, epgData.getChannels().get(0));
-
-                log.info("Tv channel ({}) refreshed", epgData.getChannels().get(0).getName());
-            }
-        }
-    }
-    
-    private void deleteOldProgramsFromChannel(Channel channel) {
-        channel.getPrograms().forEach(program -> {
-            Long contentID = program.getContent().getId();
-            programDao.deleteById(program.getId());
-            contentDao.deleteById(contentID);
-        });
-    }
-
-    private void createAndSaveProgramsToChannelFromPortChannels(Channel channel, PortChannel portChannel) {
-        List<PortProgram> portPortPrograms = portChannel.getPrograms();
-        portPortPrograms.forEach(portPortProgram -> {
-            Content content = new Content(null, portPortProgram.getTitle(), portPortProgram.getShort_description(), null);
-            contentDao.save(content);
-
-            Program program = new Program(null, getLocalDateTimeFromPortData(portPortProgram.getStart_datetime()), getLocalDateTimeFromPortData(portPortProgram.getEnd_datetime()), content, channel);
-            programDao.save(program);
-
-
-            channel.addProgram(program);
-        });
-    }
-
-    private List<PortChannel> discoverAvailableTvChannelsFromPortDotHu() {
-        List<PortChannel> portChannels = new LinkedList<>();
+    public List<Channel> getAvailableTvChannelsFromTvApiServer() {
+        List<Channel> channels = new LinkedList<>();
 
         for (int i = 0; i < PORT_ID_MAX_VALUE; i++) {
             String tvApiURL = BASE_URL + "channel_id[]=tvchannel-" + i + "&date=" + LocalDate.now();
 
             try {
-                final Epg epgData = restTemplate.getForObject(tvApiURL, Epg.class);
+                final ElectronicProgrammingGuide epg = restTemplate.getForObject(tvApiURL, ElectronicProgrammingGuide.class);
 
-                if (epgData == null || epgData.getChannels() == null) {
-                    log.error("Epg json object has probably changed. Cannot unpack to models. ( " + tvApiURL + " )");
-                } else {
-                    if (!epgData.getChannels().isEmpty()) {
-                        portChannels.add(epgData.getChannels().get(0));
-                    }
+                if (isEpgValid(epg)) {
+                    channels.add(createChannelFromPortChannelBasicData(epg.getChannels().get(0)));
                 }
             } catch (RuntimeException e) {
-                log.error(getErrorMessageFromRestTemplateException(e.getMessage()) + " - ( " + tvApiURL + " )");
+                log.error("{} - ({})", getErrorMessageFromRestTemplateException(e.getMessage()), tvApiURL);
             }
         }
 
-        return portChannels;
+        return channels;
     }
 
-    private void updateExistedTvChannelsDataFromPortDotHuChannels(List<PortChannel> portChannels) {
-        List<Channel> channels = channelDao.findAll();
+    @Override
+    public List<Channel> refreshChannelsPrograms(List<Channel> channels) {
+        if (!channels.isEmpty()) {
+            try {
+                final ElectronicProgrammingGuide epg = restTemplate.getForObject(generateTvApiURLFromChannels(channels), ElectronicProgrammingGuide.class);
 
-        for (Channel channel : channels) {
-            ChannelConnector channelConnector = channelConnectorDao.findByChannelId(channel.getId()).orElse(null);
-
-            if (channelConnector != null) {
-                boolean isChannelRemoved = true;
-
-                for (int i = 0; i < portChannels.size(); ) {
-                    PortChannel portChannel = portChannels.get(i);
-
-                    int portId = Integer.parseInt(portChannel.getId().substring(10));
-
-                    if (portId == channelConnector.getPortId()) {
-                        isChannelRemoved = false;
-
-                        updateChannelData(channel, portChannel);
-                        portChannels.remove(portChannel);
-                    } else {
-                        i++;
-                    }
+                if (isEpgValid(epg)) {
+                    return epg.getChannels().stream()
+                            .map(portChannel -> createNewChannelFromPortChannelAndFromOriginalChannel(portChannel, channels))
+                            .collect(Collectors.toList());
+                } else {
+                    log.error("Epg json object has probably changed. Cannot unpack to models.");
                 }
-
-                if (isChannelRemoved) {
-                    channelDao.deleteById(channel.getId());
-                    channelConnectorDao.deleteByChannelId(channel.getId());
-
-                    log.warn("Channel has been removed from port.hu. Delete channel ( " + channel.getName() + " )");
-                }
-            } else {
-                channelDao.deleteById(channel.getId());
-                log.warn("Channel connection not found. Delete channel ( " + channel.getName() + " )");
+            } catch (RuntimeException e) {
+                log.error("{}", getErrorMessageFromRestTemplateException(e.getMessage()));
             }
         }
-
-        addNewPortDotHuChannelsToChannelList(portChannels);
+        return new ArrayList<>();
     }
 
-    private void addNewPortDotHuChannelsToChannelList(List<PortChannel> portChannels) {
-        for (PortChannel portChannel : portChannels) {
-            createNewChannelAndConnectToPortId(portChannel);
-        }
+    @Override
+    public String getTvApiServerName() {
+        return TV_API_SERVER_NAME;
     }
 
-    private void updateChannelData(Channel channel, PortChannel portChannel) {
-        boolean isUpdated = false;
+    private static Channel createNewChannelFromPortChannelAndFromOriginalChannel(PortChannel portChannel, List<Channel> channels) {
+        Channel channel = selectChannelFromListById(channels, getPortChannelId(portChannel));
 
-        if (!channel.getName().equals(portChannel.getName())) {
-            isUpdated = true;
-
-            log.info("Channel name updated ( " + channel.getName() + " -> " + portChannel.getName() + " )");
-            channel.setName(portChannel.getName());
-        }
-
-        String logo = downloadLogoToBase64String(portChannel.getLogo());
-        if (!channel.getLogo().equals(logo)) {
-            isUpdated = true;
-
-            log.info("Channel logo updated ( " + channel.getName() + " )");
-            channel.setLogo(logo);
-        }
-
-        if (isUpdated) {
-            channelDao.save(channel);
-        }
+        return new Channel(
+                channel.getId(),
+                channel.getName(),
+                channel.getLogo(),
+                channel.getFollow(),
+                getProgramsFromPortChannel(portChannel, channel)
+        );
     }
 
-    private String downloadLogoToBase64String(String logoURL) {
+    private static List<Program> getProgramsFromPortChannel(PortChannel portChannel, Channel channel) {
+        return portChannel
+                .getPrograms()
+                .stream()
+                .map(portProgram -> convertPortProgramToProgramWithContent(portProgram, channel))
+                .collect(Collectors.toList());
+    }
+
+    private static Program convertPortProgramToProgramWithContent(PortProgram portProgram, Channel channel) {
+        Content content = new Content(null, portProgram.getTitle(), portProgram.getShort_description(), null);
+
+        return new Program(
+                null,
+                getLocalDateTimeFromPortData(portProgram.getStart_datetime()),
+                getLocalDateTimeFromPortData(portProgram.getEnd_datetime()),
+                content,
+                channel
+        );
+    }
+
+    private static Channel selectChannelFromListById(List<Channel> channels, Short id) {
+        return channels.stream()
+                .filter(channel -> channel.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static Channel createChannelFromPortChannelBasicData(PortChannel portChannel) {
+        Channel channel = new Channel();
+
+        channel.setId(getPortChannelId(portChannel));
+        channel.setName(portChannel.getName());
+        channel.setLogo(downloadLogoToBase64String(portChannel.getLogo()));
+
+        return channel;
+    }
+
+    private static short getPortChannelId(PortChannel portChannel) {
+        return Short.parseShort(portChannel.getId().substring(10));
+    }
+
+    private static List<Short> getChannelIdList(List<Channel> channels) {
+        return channels.stream()
+                .map(Channel::getId)
+                .collect(Collectors.toList());
+    }
+
+    private static String generateTvApiURLFromChannels(List<Channel> channels) {
+        StringBuilder tvApiUrl = new StringBuilder(BASE_URL);
+
+        for (Short id : getChannelIdList(channels)) {
+            tvApiUrl.append("channel_id[]=tvchannel-").append(id).append("&");
+        }
+
+        appendTimeToday(tvApiUrl);
+
+        return tvApiUrl.toString();
+    }
+
+    private static void appendTimeToday(StringBuilder tvApiUrl) {
+        tvApiUrl.append("date=").append(LocalDate.now());
+    }
+
+    private static void appendTimeInterval(StringBuilder tvApiUrl, byte minusDays, byte plusDays) {
+        tvApiUrl
+                .append("&i_datetime_from=")
+                .append(LocalDate.now().minusDays(minusDays))
+                .append("&i_datetime_to=")
+                .append(LocalDate.now().plusDays(plusDays + 1));
+    }
+
+    private static LocalDateTime getLocalDateTimeFromPortData(String dateTime) {
+        return LocalDateTime.of(
+                Integer.parseInt(dateTime.split("T")[0].split("-")[0]),
+                Integer.parseInt(dateTime.split("T")[0].split("-")[1]),
+                Integer.parseInt(dateTime.split("T")[0].split("-")[2]),
+                Integer.parseInt(dateTime.split("T")[1].split(":")[0]),
+                Integer.parseInt(dateTime.split("T")[1].split(":")[1])
+        );
+    }
+
+    private static String downloadLogoToBase64String(String logoURL) {
+        if (isBase64String(logoURL)) {
+            return logoURL;
+        }
+
         try {
-            if (logoURL.startsWith("data")) {
-                return logoURL;
-            }
-
             URL url = new URL(logoURL);
-
             InputStream in = new BufferedInputStream(url.openStream());
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -222,15 +187,16 @@ public class DataGrabberPortDotHu implements DataGrabber {
             in.close();
 
             return generateBase64PreStringFromURL(logoURL) + Base64.getEncoder().encodeToString(out.toByteArray());
+        } catch (UnknownFormatException e) {
+            log.error("Can't download logo from port.hu! Unknown image format. ( {} )", logoURL);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Can't download logo from port.hu! Message: {} ( {} )", e.getMessage(), logoURL);
         }
 
-        return null;
+        return "";
     }
 
-    // TODO hibadobás szebb
-    private String generateBase64PreStringFromURL(String logoURL) {
+    private static String generateBase64PreStringFromURL(String logoURL) {
         if (logoURL.endsWith("jpg") || logoURL.endsWith("jpeg")) {
             return "data:image/jpeg;base64,";
         }
@@ -241,87 +207,18 @@ public class DataGrabberPortDotHu implements DataGrabber {
             return  "data:image/bmp;base64,";
         }
 
-        log.error("Can't download logo from port.hu! Unknown image format. ({})", logoURL);
-        return "";
+        throw new UnknownFormatException();
     }
 
-    private void createNewChannelAndConnectToPortId(PortChannel portChannel) {
-        Channel channel = new Channel();
-        channel.setName(portChannel.getName());
-        channel.setLogo(downloadLogoToBase64String(portChannel.getLogo()));
-        channel.setFollow(true);
-
-        channelDao.save(channel);
-
-        ChannelConnector channelConnector = new ChannelConnector();
-        channelConnector.setChannelId(channel.getId());
-        channelConnector.setPortId(Integer.parseInt(portChannel.getId().substring(10)));
-
-        channelConnectorDao.save(channelConnector);
-
-        log.info("New TV channel added ({})", channel.getName());
+    private static boolean isBase64String(String logoURL) {
+        return logoURL.startsWith("data");
     }
 
-    private String generateTvApiURLByFollowedChannels() {
-        List<Integer> portIds = getFollowedChannelsPortIds();
-
-        StringBuilder tvApiUrl = new StringBuilder(BASE_URL);
-        for (Integer id : portIds) {
-            if (id != null) {
-                tvApiUrl.append("channel_id[]=tvchannel-").append(id).append("&");
-            }
-        }
-        appendTimeInterval(tvApiUrl);
-
-        return tvApiUrl.toString();
+    private static boolean isEpgValid(ElectronicProgrammingGuide epg) {
+        return epg != null && epg.getChannels() != null && !epg.getChannels().isEmpty();
     }
 
-    private List<Integer> getFollowedChannelsPortIds() {
-        return channelDao.findChannelsByFollowEquals(true).stream()
-                .map(this::getPortIdByChannel)
-                .collect(Collectors.toList());
-    }
-
-    private Integer getPortIdByChannel(Channel channel) {
-        ChannelConnector channelConnector = channelConnectorDao.findByChannelId(channel.getId()).orElse(null);
-        if (channelConnector != null) {
-            return channelConnector.getPortId();
-        }
-
-        return null;
-    }
-
-    private String generateTvApiURLByPortId(Integer portId) {
-        StringBuilder tvApiUrl = new StringBuilder(BASE_URL);
-        if (portId != null) {
-            tvApiUrl.append("channel_id[]=tvchannel-").append(portId).append("&");
-        }
-        appendTimeInterval(tvApiUrl);
-
-        return tvApiUrl.toString();
-    }
-
-    private void appendTimeInterval(StringBuilder tvApiUrl) {
-        // TODO: idő intervallumot megadni
-        tvApiUrl.append("date=").append(LocalDate.now());
-        /*tvApiUrl
-                .append("i_datetime_from=")
-                .append(LocalDate.now().minusDays(1))
-                .append("&i_datetime_to=")
-                .append(LocalDate.now().plusDays(2));*/
-    }
-
-    private LocalDateTime getLocalDateTimeFromPortData(String dateTime) {
-        return LocalDateTime.of(
-                Integer.parseInt(dateTime.split("T")[0].split("-")[0]),
-                Integer.parseInt(dateTime.split("T")[0].split("-")[1]),
-                Integer.parseInt(dateTime.split("T")[0].split("-")[2]),
-                Integer.parseInt(dateTime.split("T")[1].split(":")[0]),
-                Integer.parseInt(dateTime.split("T")[1].split(":")[1])
-        );
-    }
-
-    private String getErrorMessageFromRestTemplateException(String errorMessage) {
+    private static String getErrorMessageFromRestTemplateException(String errorMessage) {
         try {
             String status = errorMessage.split("status\":")[1].split("}")[0];
             String name = errorMessage.split("name\":\"")[1].split("\",\"")[0];

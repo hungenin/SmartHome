@@ -9,10 +9,10 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableScheduling
-public class SmartHomeApplication {
+public class SmartHomeServer {
 
     public static void main(String[] args) {
-        SpringApplication.run(SmartHomeApplication.class, args);
+        SpringApplication.run(SmartHomeServer.class, args);
     }
 
     @Bean
